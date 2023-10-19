@@ -12,6 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - name: Set JDK/Maven
         uses: actions/setup-java@v3
         with:
@@ -23,6 +24,7 @@ jobs:
           server-password: OSSRH_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
+
       - name: Build with Maven
         run: mvn package -V -B -ntp
         env:
