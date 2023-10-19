@@ -1,16 +1,22 @@
 #file: noinspection SpellCheckingInspection
 name: CI/CD
+
 on:
   push:
     tags:
       - '*'
+
 permissions:
   contents: write
+
 jobs:
+
   publish:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - name: Set JDK/Maven
         uses: actions/setup-java@v3
         with:
@@ -22,23 +28,29 @@ jobs:
           server-password: OSSRH_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
+
       - name: Get version number from tag
         run: |
           TAG=${{ github.ref_name }}
           echo "VERSION=${TAG#v}" >> $GITHUB_ENV
+
       - name: Update version in pom.xml
         run: mvn versions:set -DnewVersion=${{ env.VERSION }} -DgenerateBackupPoms=false --batch-mode --no-transfer-progress
+
       - name: Build with Maven
         run: mvn clean package -V -B -ntp
-      - name: Create Release
-        uses: ncipollo/release-action@v1.13.0
+
+      - name: Release
+        uses: softprops/action-gh-release@v0.1.15
+        if: startsWith(github.ref, 'refs/tags/')
         with:
-          allowUpdates: true
-          generateReleaseNotes: true
-          artifacts: "${{ github.workspace }}/target/*.jar"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          generate_release_notes: true
+          files: |
+            "${{ github.workspace }}/target/*.jar"
+
       - name: Publish package
         run: mvn deploy -DskipTests -V -B -ntp -Dlicense.skip=true
+
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
