@@ -46,7 +46,7 @@ jobs:
         with:
           generate_release_notes: true
           files: |
-            "${{ github.workspace }}/target/*.jar"
+            target/*.jar
 
       - name: Publish package
         run: mvn deploy -DskipTests -V -B -ntp -Dlicense.skip=true
