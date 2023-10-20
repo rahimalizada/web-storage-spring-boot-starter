@@ -1,6 +1,10 @@
 build:
-  - '.github/**'
-  - 'pom.xml'
+  - any:
+      - changed-files:
+      - '.github/**'
+      - - 'pom.xml'
 
 test:
-  - 'src/test/**'
+  - any:
+      - changed-files:
+      - 'src/test/**'
