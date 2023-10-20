@@ -38,8 +38,13 @@ class StorageSizeValidatorTest {
 
     @Test
     public void validate_ValidArgs_Ok() {
-        this.validator.validate(WebFileType.NO_CHECK, "unused", payload);
-        this.validator.validate(WebFileType.VALID, "unused", payload);
+        Assertions.assertTrue(this.validator.validate(WebFileType.NO_CHECK, "unused", payload).isEmpty());
+        Assertions.assertTrue(this.validator.validate(WebFileType.VALID, "unused", payload).isEmpty());
+    }
+
+    @Test
+    public void validate_invalidConfig_emptyMap() {
+        Assertions.assertTrue(this.validator.validate(new Object(), "unused", payload).isEmpty());
     }
 
     @Test
