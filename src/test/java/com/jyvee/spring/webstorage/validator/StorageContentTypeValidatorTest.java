@@ -38,8 +38,14 @@ class StorageContentTypeValidatorTest {
 
     @Test
     public void validate_ValidArgs_Ok() {
-        this.validator.validate(WebFileType.NO_CHECK, "image/jpeg", payload);
-        this.validator.validate(WebFileType.VALID, "image/jpeg", payload);
+        Assertions.assertTrue(this.validator.validate(WebFileType.NO_CHECK, "image/jpeg", payload).isEmpty());
+        Assertions.assertTrue(this.validator.validate(WebFileType.VALID, "image/jpeg", payload).isEmpty());
+    }
+
+    @Test
+    public void validate_invalidConfig_emptyMap() {
+        Assertions.assertTrue(this.validator.validate(new Object(), "image/jpeg", payload).isEmpty());
+        Assertions.assertTrue(this.validator.validate(new Object(), "unused", payload).isEmpty());
     }
 
     @Test
