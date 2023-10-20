@@ -1,0 +1,25 @@
+name: Conventional release labels
+
+on:
+  pull_request_target:
+    types: [ opened, edited ]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: bcoe/conventional-release-labels@v1.3.0
+        with:
+          ignore_label: 'ignore-for-release'
+          ignored_types: '["chore"]'
+          type_labels: |
+            {
+              "feat": "feature",
+              "fix": "fix",
+              "breaking": "breaking",
+              "build": "build",
+              "ci": "build",
+              "test": "test",
+              "refactor": "refactor",
+              "perf": "performance"
+            }
