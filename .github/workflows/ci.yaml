@@ -27,6 +27,10 @@ jobs:
 
       - name: Build with Maven
         run: mvn package -V -B -ntp
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+
         env:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
