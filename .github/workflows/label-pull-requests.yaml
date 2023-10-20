@@ -1,17 +1,23 @@
-name: Conventional release labels
+name: Label Pull Requests
 
 on:
   pull_request_target:
     types: [ opened, edited ]
 
 jobs:
-  label-release-notes:
+  label:
+    name: Label PRs
     runs-on: ubuntu-latest
     permissions:
       contents: read
       pull-requests: write
     steps:
-      - uses: bcoe/conventional-release-labels@v1.3.1
+      - name: Pull Request labeler
+        uses: actions/labeler@v5.0.0-beta.1
+        with:
+          configuration-path: '.github/labeler.yaml'
+      - name: Conventional Release Labeler
+        uses: bcoe/conventional-release-labels@v1.3.1
         with:
           ignore_label: 'ignore-for-release'
           ignored_types: '["chore"]'
