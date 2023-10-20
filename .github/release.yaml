@@ -11,9 +11,21 @@ changelog:
     - title: Exciting New Features 🎉
       labels:
         - feature
+        - enhancement
     - title: Fixes 🔧
       labels:
         - fix
-    - title: Other Changes
+        - bug
+    - title: Performance 🏎
+      labels:
+        - performance
+    - title: '🧰 Maintenance'
+      labels:
+        - build
+        - ci
+    #        - "infrastructure"
+    #        - "automation"
+    #        - "documentation"
+    - title: Other Changes 🧹
       labels:
         - '*'
