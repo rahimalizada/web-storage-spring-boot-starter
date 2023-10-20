@@ -2,7 +2,9 @@ build:
   - any:
       - changed-files:
       - '.github/**'
-      - - 'pom.xml'
+      - 'pom.xml'
+      - '.gitignore'
+      - 'lombok.config'
 
 test:
   - any:
