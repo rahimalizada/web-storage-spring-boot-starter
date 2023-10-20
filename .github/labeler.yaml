@@ -1,6 +1,6 @@
 build:
-  - .github/**
-  - pom.xml
+  - '.github/**'
+  - 'pom.xml'
 
 test:
-  - src/test/**
+  - 'src/test/**'
