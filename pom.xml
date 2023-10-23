@@ -81,7 +81,7 @@
     <s3mock-testcontainers.version>3.1.0</s3mock-testcontainers.version>
     <s3.version>2.21.5</s3.version>
 
-    <maven-surefire-plugin.version>3.1.2</maven-surefire-plugin.version>
+    <maven-surefire-plugin.version>3.2.1</maven-surefire-plugin.version>
     <maven-failsafe-plugin.version>3.1.2</maven-failsafe-plugin.version>
     <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
     <maven-gpg-plugin.version>3.1.0</maven-gpg-plugin.version>
