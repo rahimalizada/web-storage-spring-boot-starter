@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -35,8 +36,12 @@ public class S3ClientProvider {
             StaticCredentialsProvider.create(AwsBasicCredentials.create(configuration.getKey(), configuration.getSecret()));
         return S3Client.builder()
             // Required for mocking on localhost
-            .forcePathStyle(true).endpointOverride(configuration.getServiceEndpoint()).region(Region.of(configuration.getRegion()))
-            .credentialsProvider(credentialsProvider).build();
+            .forcePathStyle(true)
+            .endpointOverride(configuration.getServiceEndpoint())
+            .region(Region.of(configuration.getRegion()))
+            .credentialsProvider(credentialsProvider)
+            .httpClientBuilder(UrlConnectionHttpClient.builder())
+            .build();
     }
 
 }
