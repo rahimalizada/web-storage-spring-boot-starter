@@ -20,6 +20,7 @@ import com.jyvee.spring.webstorage.configuration.StorageConfigurationProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
 
+@Lazy
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
 @ConditionalOnBean(StorageConfigurationProperties.class)
@@ -36,26 +38,34 @@ import java.util.Map;
 class StorageImageValidator implements StorageValidator {
 
     @Override
-    public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType, @NotNull final byte[] payload) {
+    public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType,
+        @NotNull final byte[] payload) {
         return configuration instanceof final StorageImageValidatorConfiguration validatorConfiguration ?
             validateInternal(validatorConfiguration, contentType, payload) : Map.of();
     }
 
-    private Map<String, String> validateInternal(final StorageImageValidatorConfiguration validatorConfiguration, final String contentType,
+    private Map<String, String> validateInternal(final StorageImageValidatorConfiguration validatorConfiguration,
+        final String contentType,
         @NotNull final byte[] payload) {
-        if (validatorConfiguration.getMinWidth() == null && validatorConfiguration.getMinHeight() == null && validatorConfiguration.getMaxWidth() == null
+        if (validatorConfiguration.getMinWidth() == null && validatorConfiguration.getMinHeight() == null
+            && validatorConfiguration.getMaxWidth() == null
             && validatorConfiguration.getMaxHeight() == null) {
             return Map.of();
         }
         try {
-            return checkImage(contentType, payload, validatorConfiguration.getMinWidth(), validatorConfiguration.getMinHeight(),
-                validatorConfiguration.getMaxWidth(), validatorConfiguration.getMaxHeight());
+            return checkImage(contentType,
+                payload,
+                validatorConfiguration.getMinWidth(),
+                validatorConfiguration.getMinHeight(),
+                validatorConfiguration.getMaxWidth(),
+                validatorConfiguration.getMaxHeight());
         } catch (final IOException e) {
             throw new IllegalArgumentException("Invalid image file", e);
         }
     }
 
-    private Map<String, String> checkImage(final String contentType, final byte[] payload, @Nullable final Integer minWidth, @Nullable final Integer minHeight,
+    private Map<String, String> checkImage(final String contentType, final byte[] payload,
+        @Nullable final Integer minWidth, @Nullable final Integer minHeight,
         @Nullable final Integer maxWidth, @Nullable final Integer maxHeight) throws IOException {
 
         // final String extension = FileUtils.getFilenameExtension(filename).orElseThrow().toLowerCase(Locale.ENGLISH);
@@ -75,7 +85,10 @@ class StorageImageValidator implements StorageValidator {
             throw new IllegalArgumentException("Image height is too big");
         }
 
-        return Map.of("width", String.valueOf(bufferedImage.getWidth()), "height", String.valueOf(bufferedImage.getHeight()));
+        return Map.of("width",
+            String.valueOf(bufferedImage.getWidth()),
+            "height",
+            String.valueOf(bufferedImage.getHeight()));
 
         // return Map.of();
     }

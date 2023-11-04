@@ -20,24 +20,29 @@ import com.jyvee.spring.webstorage.configuration.StorageConfigurationProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Lazy
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ConditionalOnBean(StorageConfigurationProperties.class)
 class StorageSizeValidator implements StorageValidator {
 
     @Override
-    public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType, @NotNull final byte[] payload) {
-        return configuration instanceof final StorageSizeValidatorConfiguration validatorConfiguration ? validateInternal(validatorConfiguration, payload) :
+    public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType,
+        @NotNull final byte[] payload) {
+        return configuration instanceof final StorageSizeValidatorConfiguration validatorConfiguration
+            ? validateInternal(validatorConfiguration, payload) :
             Map.of();
     }
 
-    private Map<String, String> validateInternal(final StorageSizeValidatorConfiguration validatorConfiguration, final byte[] payload) {
+    private Map<String, String> validateInternal(final StorageSizeValidatorConfiguration validatorConfiguration,
+        final byte[] payload) {
         if (validatorConfiguration.getMaxSize() != null && payload.length > validatorConfiguration.getMaxSize()) {
             throw new IllegalArgumentException("File size is too big");
         }

@@ -20,25 +20,30 @@ import com.jyvee.spring.webstorage.configuration.StorageConfigurationProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
+@Lazy
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ConditionalOnBean(StorageConfigurationProperties.class)
 class StorageContentTypeValidator implements StorageValidator {
 
     @Override
-    public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType, @NotNull final byte[] payload) {
+    public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType,
+        @NotNull final byte[] payload) {
         return configuration instanceof final StorageContentTypeValidatorConfiguration validatorConfiguration ?
             validateInternal(validatorConfiguration, contentType) : Map.of();
     }
 
-    private Map<String, String> validateInternal(final StorageContentTypeValidatorConfiguration validatorConfiguration, final String contentType) {
-        if (validatorConfiguration.getContentTypes() != null && !validatorConfiguration.getContentTypes().contains(contentType)) {
+    private Map<String, String> validateInternal(final StorageContentTypeValidatorConfiguration validatorConfiguration,
+        final String contentType) {
+        if (validatorConfiguration.getContentTypes() != null && !validatorConfiguration.getContentTypes()
+            .contains(contentType)) {
             throw new IllegalArgumentException("Content type is not allowed");
         }
         return Map.of();
