@@ -17,23 +17,29 @@
 package com.jyvee.spring.webstorage.provider;
 
 import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationProperties;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.http.urlconnection.UrlConnectionHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
+@Slf4j
 @Configuration
 public class S3ClientProvider {
 
+    @Lazy
     @Bean
     @ConditionalOnBean(S3StorageConfigurationProperties.class)
     public S3Client getS3Client(final S3StorageConfigurationProperties configuration) {
+        log.debug("Instantiating S3Client bean");
         final StaticCredentialsProvider credentialsProvider =
-            StaticCredentialsProvider.create(AwsBasicCredentials.create(configuration.getKey(), configuration.getSecret()));
+            StaticCredentialsProvider.create(AwsBasicCredentials.create(configuration.getKey(),
+                configuration.getSecret()));
         return S3Client.builder()
             // Required for mocking on localhost
             .forcePathStyle(true)

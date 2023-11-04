@@ -32,6 +32,7 @@ import java.util.List;
 public abstract class AbstractS3StorageRepository<T>
     implements S3StorageProvider<T>, StorageRepository<T, S3StorageConfigurationProperties> {
 
+    @Lazy
     @Autowired
     private S3Client s3Client;
 
