@@ -23,12 +23,14 @@ import com.jyvee.spring.webstorage.provider.StoragePathProvider;
 import com.jyvee.spring.webstorage.validator.StorageValidator;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.List;
 
 @Getter
-public abstract class AbstractS3StorageRepository<T> implements S3StorageProvider<T>, StorageRepository<T, S3StorageConfigurationProperties> {
+public abstract class AbstractS3StorageRepository<T>
+    implements S3StorageProvider<T>, StorageRepository<T, S3StorageConfigurationProperties> {
 
     @Autowired
     private S3Client s3Client;
@@ -36,6 +38,7 @@ public abstract class AbstractS3StorageRepository<T> implements S3StorageProvide
     @Autowired
     private S3StorageConfigurationProperties configuration;
 
+    @Lazy
     @Autowired(required = false)
     private List<StorageValidator> validators = List.of();
 

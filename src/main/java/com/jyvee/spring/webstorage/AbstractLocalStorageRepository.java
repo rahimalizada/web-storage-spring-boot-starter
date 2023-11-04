@@ -23,15 +23,18 @@ import com.jyvee.spring.webstorage.provider.StoragePathProvider;
 import com.jyvee.spring.webstorage.validator.StorageValidator;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.List;
 
 @Getter
-public abstract class AbstractLocalStorageRepository<T> implements LocalStorageProvider<T>, StorageRepository<T, LocalStorageConfigurationProperties> {
+public abstract class AbstractLocalStorageRepository<T>
+    implements LocalStorageProvider<T>, StorageRepository<T, LocalStorageConfigurationProperties> {
 
     @Autowired
     private LocalStorageConfigurationProperties configuration;
 
+    @Lazy
     @Autowired(required = false)
     private List<StorageValidator> validators = List.of();
 
