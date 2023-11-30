@@ -77,7 +77,7 @@
     <spotbugs.version>4.8.2</spotbugs.version>
     <slf4j.version>2.0.9</slf4j.version>
     <jmh.version>1.37</jmh.version>
-    <testcontainers.version>1.19.2</testcontainers.version>
+    <testcontainers.version>1.19.3</testcontainers.version>
     <s3mock-testcontainers.version>3.2.0</s3mock-testcontainers.version>
     <aws.java.sdk.version>2.21.26</aws.java.sdk.version>
 
