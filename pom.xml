@@ -74,7 +74,7 @@
     <spring-boot.version>3.2.0</spring-boot.version>
     <junit.version>5.10.0</junit.version>
     <lombok.version>1.18.30</lombok.version>
-    <spotbugs.version>4.8.2</spotbugs.version>
+    <spotbugs.version>4.8.3</spotbugs.version>
     <slf4j.version>2.0.9</slf4j.version>
     <jmh.version>1.37</jmh.version>
     <testcontainers.version>1.19.3</testcontainers.version>
