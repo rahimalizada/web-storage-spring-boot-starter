@@ -41,7 +41,7 @@ jobs:
         run: mvn clean package -V -B -ntp
 
       - name: Codecov Coverage Reporter
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
 
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
