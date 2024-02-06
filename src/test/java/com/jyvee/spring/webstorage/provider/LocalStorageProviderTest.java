@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2024 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.jyvee.spring.webstorage.provider;
 
 import com.jyvee.spring.test.webstorage.LocalStorageProvider;
 import com.jyvee.spring.webstorage.configuration.LocalStorageConfigurationProperties;
+import com.jyvee.spring.webstorage.configuration.LocalStorageConfigurationPropertiesImpl;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 
@@ -34,7 +35,7 @@ class LocalStorageProviderTest extends AbstractStorageProviderTest {
         final Path basePath = Files.createTempDirectory("");
 
         final LocalStorageConfigurationProperties configurationProperties =
-            new LocalStorageConfigurationProperties(URI.create("https://site.url/base"), basePath);
+            new LocalStorageConfigurationPropertiesImpl(URI.create("https://site.url/base"), basePath);
         setProvider(new LocalStorageProvider(configurationProperties));
     }
 

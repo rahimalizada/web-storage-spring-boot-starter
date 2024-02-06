@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2024 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.jyvee.spring.webstorage.provider;
 
 import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationProperties;
+import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationPropertiesImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -27,8 +28,9 @@ class S3ClientProviderTest {
 
     @Test
     public void getS3Client_validArgs_Ok() {
-        final S3StorageConfigurationProperties configurationProperties = new S3StorageConfigurationProperties(
-            URI.create("https://s3.url/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url/base"));
+        final S3StorageConfigurationProperties configurationProperties =
+            new S3StorageConfigurationPropertiesImpl(URI.create(
+                "https://s3.url/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url/base"));
         final S3Client s3Client = new S3ClientProvider().getS3Client(configurationProperties);
         Assertions.assertNotNull(s3Client);
     }

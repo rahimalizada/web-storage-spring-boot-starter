@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2024 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,33 +53,60 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
     S3Client getS3Client();
 
     @Override
-    default T save(final String path, final String contentType, final byte[] payload, final Map<String, String> metadata) {
+    default T save(final String path, final String contentType, final byte[] payload,
+                   final Map<String, String> metadata) {
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
 
-        final Map<String, String> sanitizedMetadata =
-            metadata.entrySet().stream()
-                .collect(Collectors.toMap(Entry::getKey, entry -> URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8), (first, second) -> second,
-                    LinkedHashMap::new));
+        final Map<String, String> sanitizedMetadata = metadata
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Entry::getKey,
+                entry -> URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8),
+                (first, second) -> second,
+                LinkedHashMap::new));
 
-        final PutObjectRequest request =
-            PutObjectRequest.builder().bucket(getConfiguration().getBucket()).contentType(contentType).key(sanitizedPath)
-                .acl(ObjectCannedACL.PUBLIC_READ).metadata(sanitizedMetadata).build();
+        final PutObjectRequest request = PutObjectRequest
+            .builder()
+            .bucket(getConfiguration().getBucket())
+            .contentType(contentType)
+            .key(sanitizedPath)
+            .acl(ObjectCannedACL.PUBLIC_READ)
+            .metadata(sanitizedMetadata)
+            .build();
         final RequestBody requestBody = RequestBody.fromBytes(payload);
 
         final PutObjectResponse putObject = getS3Client().putObject(request, requestBody);
-        final URI uri = UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).path("/").path(sanitizedPath).build().toUri();
-        return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, contentType, payload.length, stripEtag(putObject.eTag()), metadata,
+        final URI uri = UriComponentsBuilder
+            .fromUri(getConfiguration().getEndpoint())
+            .path("/")
+            .path(sanitizedPath)
+            .build()
+            .toUri();
+        return newInstance(uri,
+            getConfiguration().getStorageId(),
+            sanitizedPath,
+            contentType,
+            payload.length,
+            stripEtag(putObject.eTag()),
+            metadata,
             Instant.now());
     }
 
     @Override
     default List<String> list(final String path) {
-        final ListObjectsV2Request request =
-            ListObjectsV2Request.builder().bucket(getConfiguration().getBucket()).prefix(StorageProviderUtil.sanitizePath(path))
-                .maxKeys(Integer.MAX_VALUE).build();
+        final ListObjectsV2Request request = ListObjectsV2Request
+            .builder()
+            .bucket(getConfiguration().getBucket())
+            .prefix(StorageProviderUtil.sanitizePath(path))
+            .maxKeys(Integer.MAX_VALUE)
+            .build();
 
         final ListObjectsV2Iterable listObjectsV2Paginator = getS3Client().listObjectsV2Paginator(request);
-        return listObjectsV2Paginator.stream().map(ListObjectsV2Response::contents).flatMap(Collection::stream).map(S3Object::key)
+        return listObjectsV2Paginator
+            .stream()
+            .map(ListObjectsV2Response::contents)
+            .flatMap(Collection::stream)
+            .map(S3Object::key)
             .toList();
     }
 
@@ -89,9 +116,20 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
         final GetObjectRequest getObjectRequest =
             GetObjectRequest.builder().bucket(getConfiguration().getBucket()).key(sanitizedPath).build();
         try (ResponseInputStream<GetObjectResponse> response = getS3Client().getObject(getObjectRequest)) {
-            final URI uri = UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).path("/").path(sanitizedPath).build().toUri();
-            return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, response.response().contentType(), response.response().contentLength(),
-                stripEtag(response.response().eTag()), response.response().metadata(), response.response().lastModified());
+            final URI uri = UriComponentsBuilder
+                .fromUri(getConfiguration().getEndpoint())
+                .path("/")
+                .path(sanitizedPath)
+                .build()
+                .toUri();
+            return newInstance(uri,
+                getConfiguration().getStorageId(),
+                sanitizedPath,
+                response.response().contentType(),
+                response.response().contentLength(),
+                stripEtag(response.response().eTag()),
+                response.response().metadata(),
+                response.response().lastModified());
         } catch (final SdkException e) {
             throw new IOException(e);
         }
@@ -102,10 +140,14 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
         if (paths.isEmpty()) {
             return;
         }
-        final List<ObjectIdentifier> objectIdentifiers =
-            paths.stream().map(StorageProviderUtil::sanitizePath).map(path -> ObjectIdentifier.builder().key(path).build()).toList();
+        final List<ObjectIdentifier> objectIdentifiers = paths
+            .stream()
+            .map(StorageProviderUtil::sanitizePath)
+            .map(path -> ObjectIdentifier.builder().key(path).build())
+            .toList();
         final Delete delete = Delete.builder().objects(objectIdentifiers).quiet(true).build();
-        final DeleteObjectsRequest request = DeleteObjectsRequest.builder().bucket(getConfiguration().getBucket()).delete(delete).build();
+        final DeleteObjectsRequest request =
+            DeleteObjectsRequest.builder().bucket(getConfiguration().getBucket()).delete(delete).build();
 
         getS3Client().deleteObjects(request);
     }
@@ -123,10 +165,14 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
 
     @Override
     default void copy(final String fromPath, final String toPath) {
-        final CopyObjectRequest request =
-            CopyObjectRequest.builder().destinationBucket(getConfiguration().getBucket()).sourceBucket(getConfiguration().getBucket())
-                .sourceKey(StorageProviderUtil.sanitizePath(fromPath)).destinationKey(StorageProviderUtil.sanitizePath(toPath))
-                .acl(ObjectCannedACL.PUBLIC_READ).build();
+        final CopyObjectRequest request = CopyObjectRequest
+            .builder()
+            .destinationBucket(getConfiguration().getBucket())
+            .sourceBucket(getConfiguration().getBucket())
+            .sourceKey(StorageProviderUtil.sanitizePath(fromPath))
+            .destinationKey(StorageProviderUtil.sanitizePath(toPath))
+            .acl(ObjectCannedACL.PUBLIC_READ)
+            .build();
 
         getS3Client().copyObject(request);
     }
