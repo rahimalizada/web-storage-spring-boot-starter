@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2024 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,18 @@
 package com.jyvee.spring.test.webstorage;
 
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 @SpringBootApplication
-public class TestApplication {}
+public class TestApplication {
+
+    @Bean
+    // Added to enforce interface injection for storage configuration properties
+    public MethodValidationPostProcessor validationPostProcessor() {
+        final MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
+        processor.setAdaptConstraintViolations(true);
+        return processor;
+    }
+
+}

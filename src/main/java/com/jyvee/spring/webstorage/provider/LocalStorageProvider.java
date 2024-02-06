@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2024 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,14 +45,19 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
     @Override
     default List<String> list(final String path) throws IOException {
         final Path dirPath = getConfiguration().getPath().resolve(StorageProviderUtil.sanitizePath(path));
-        return StorageProviderUtil.listFiles(dirPath).stream().map(getConfiguration().getPath()::relativize).map(Path::toString)
+        return StorageProviderUtil
+            .listFiles(dirPath)
+            .stream()
+            .map(getConfiguration().getPath()::relativize)
+            .map(Path::toString)
             .map(pathStr -> pathStr.replace('\\', '/'))
             .toList();
     }
 
     @Override
     @SuppressWarnings("SpellCheckingInspection")
-    default T save(final String path, final String contentType, final byte[] payload, final Map<String, String> metadata) throws IOException {
+    default T save(final String path, final String contentType, final byte[] payload,
+                   final Map<String, String> metadata) throws IOException {
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
         final Path filePath = getConfiguration().getPath().resolve(sanitizedPath);
 
@@ -61,7 +66,8 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
         StorageProviderUtil.createMissingDirectories(filePath.getParent(), "www-data", "www-data", "rwxr-xr-x");
         Files.write(filePath, payload, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         StorageProviderUtil.setPermissions(filePath, "www-data", "www-data", "rwxr-xr-x");
-        final UserDefinedFileAttributeView view = Files.getFileAttributeView(filePath, UserDefinedFileAttributeView.class);
+        final UserDefinedFileAttributeView view =
+            Files.getFileAttributeView(filePath, UserDefinedFileAttributeView.class);
         view.write(CONTENT_TYPE_ATTRIBUTE, Charset.defaultCharset().encode(contentType));
         view.write(MD5_ATTRIBUTE, Charset.defaultCharset().encode(md5));
         for (final Entry<String, String> entry : metadata.entrySet()) {
@@ -69,8 +75,15 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
             final String value = entry.getValue();
             view.write(METADATA_ATTRIBUTE_PREFIX + key, Charset.defaultCharset().encode(value));
         }
-        final URI uri = UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).pathSegment(sanitizedPath).build().toUri();
-        return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, contentType, payload.length, md5, metadata,
+        final URI uri =
+            UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).pathSegment(sanitizedPath).build().toUri();
+        return newInstance(uri,
+            getConfiguration().getStorageId(),
+            sanitizedPath,
+            contentType,
+            payload.length,
+            md5,
+            metadata,
             Files.getLastModifiedTime(filePath).toInstant());
     }
 
@@ -79,7 +92,8 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
         final Path filePath = getConfiguration().getPath().resolve(sanitizedPath);
 
-        final UserDefinedFileAttributeView view = Files.getFileAttributeView(filePath, UserDefinedFileAttributeView.class);
+        final UserDefinedFileAttributeView view =
+            Files.getFileAttributeView(filePath, UserDefinedFileAttributeView.class);
         final String contentType = readAttribute(view, CONTENT_TYPE_ATTRIBUTE);
         final String md5 = readAttribute(view, MD5_ATTRIBUTE);
         final Map<String, String> metadata = new LinkedHashMap<>();
@@ -90,8 +104,15 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
             metadata.put(attribute.substring(METADATA_ATTRIBUTE_PREFIX.length()), readAttribute(view, attribute));
         }
 
-        final URI uri = UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).pathSegment(sanitizedPath).build().toUri();
-        return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, contentType, Files.size(filePath), md5, metadata,
+        final URI uri =
+            UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).pathSegment(sanitizedPath).build().toUri();
+        return newInstance(uri,
+            getConfiguration().getStorageId(),
+            sanitizedPath,
+            contentType,
+            Files.size(filePath),
+            md5,
+            metadata,
             Files.getLastModifiedTime(filePath).toInstant());
     }
 

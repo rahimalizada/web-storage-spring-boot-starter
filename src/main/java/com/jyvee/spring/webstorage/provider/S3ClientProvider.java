@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2024 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.jyvee.spring.webstorage.provider;
 
 import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationProperties;
+import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationPropertiesImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
@@ -34,20 +35,20 @@ public class S3ClientProvider {
 
     @Lazy
     @Bean
-    @ConditionalOnBean(S3StorageConfigurationProperties.class)
+    @ConditionalOnBean(S3StorageConfigurationPropertiesImpl.class)
     public S3Client getS3Client(final S3StorageConfigurationProperties configuration) {
         log.debug("Instantiating S3Client bean");
         final StaticCredentialsProvider credentialsProvider =
             StaticCredentialsProvider.create(AwsBasicCredentials.create(configuration.getKey(),
                 configuration.getSecret()));
         return S3Client.builder()
-            // Required for mocking on localhost
-            .forcePathStyle(true)
-            .endpointOverride(configuration.getServiceEndpoint())
-            .region(Region.of(configuration.getRegion()))
-            .credentialsProvider(credentialsProvider)
-            .httpClientBuilder(UrlConnectionHttpClient.builder())
-            .build();
+                       // Required for mocking on localhost
+                       .forcePathStyle(true)
+                       .endpointOverride(configuration.getServiceEndpoint())
+                       .region(Region.of(configuration.getRegion()))
+                       .credentialsProvider(credentialsProvider)
+                       .httpClientBuilder(UrlConnectionHttpClient.builder())
+                       .build();
     }
 
 }

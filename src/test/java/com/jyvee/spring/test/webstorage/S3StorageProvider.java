@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2024 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,9 @@ public class S3StorageProvider implements com.jyvee.spring.webstorage.provider.S
     }
 
     @Override
-    public WebFile newInstance(final URI uri, final String storageId, final String path, final String contentType, final long size,
-        final String checksum, final Map<String, String> metadata, final Instant timestamp) {
+    public WebFile newInstance(final URI uri, final String storageId, final String path, final String contentType,
+                               final long size, final String checksum, final Map<String, String> metadata,
+                               final Instant timestamp) {
         return new WebFile(uri, storageId, path, contentType, size, checksum, metadata, timestamp);
     }
 
