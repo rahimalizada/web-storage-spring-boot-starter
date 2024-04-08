@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2023 Rahim Alizada
+  ~ Copyright (c) 2023-2024 Rahim Alizada
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@
   <scm>
     <url>https://github.com/rahimalizada/web-storage-spring-boot-starter</url>
     <connection>scm:git:https://github.com/rahimalizada/web-storage-spring-boot-starter.git</connection>
-    <developerConnection>scm:git:https://github.com/rahimalizada/web-storage-spring-boot-starter.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/rahimalizada/web-storage-spring-boot-starter.git
+    </developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -67,8 +68,8 @@
   </distributionManagement>
 
   <properties>
-    <maven.compiler.source>21</maven.compiler.source>
-    <maven.compiler.target>21</maven.compiler.target>
+    <maven.compiler.source>22</maven.compiler.source>
+    <maven.compiler.target>22</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <spring-boot.version>3.2.4</spring-boot.version>
