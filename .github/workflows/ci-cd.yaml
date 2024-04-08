@@ -21,14 +21,14 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'oracle'
-          java-version: '21'
+          java-version: '22'
           cache: 'maven'
           server-id: ossrh
           server-username: OSSRH_USERNAME
           server-password: OSSRH_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
-          
+
       - name: Get version number from tag
         run: |
           TAG=${{ github.ref_name }}
@@ -41,7 +41,10 @@ jobs:
         run: mvn clean package -V -B -ntp
 
       - name: Codecov Coverage Reporter
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: rahimalizada/method-profiler-spring-boot-starter
 
       - name: Codacy Coverage Reporter
         uses: codacy/codacy-coverage-reporter-action@v1.3.0
