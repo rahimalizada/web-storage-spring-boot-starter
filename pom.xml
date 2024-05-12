@@ -79,7 +79,7 @@
     <slf4j.version>2.0.12</slf4j.version>
     <jmh.version>1.37</jmh.version>
     <testcontainers.version>1.19.8</testcontainers.version>
-    <s3mock-testcontainers.version>3.7.3</s3mock-testcontainers.version>
+    <s3mock-testcontainers.version>3.8.0</s3mock-testcontainers.version>
     <aws.java.sdk.version>2.25.50</aws.java.sdk.version>
 
     <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
