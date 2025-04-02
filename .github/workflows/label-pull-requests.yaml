@@ -13,7 +13,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Pull Request labeler
-        uses: actions/labeler@v5.0.0-beta.1
+        uses: actions/labeler@v5
         with:
           configuration-path: '.github/labeler.yaml'
       - name: Conventional Release Labeler
