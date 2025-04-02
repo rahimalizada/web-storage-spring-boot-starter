@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'oracle'
-          java-version: '22'
+          java-version: '24'
           cache: 'maven'
           server-id: central
           server-username: MAVEN_USERNAME
@@ -41,7 +41,7 @@ jobs:
         run: mvn clean package -V -B -ntp
 
       - name: Codecov Coverage Reporter
-        uses: codecov/codecov-action@v5.4.0
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: rahimalizada/method-profiler-spring-boot-starter
@@ -60,7 +60,7 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Release
-        uses: softprops/action-gh-release@v2.2.1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
           generate_release_notes: true
