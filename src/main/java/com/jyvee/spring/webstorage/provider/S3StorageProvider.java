@@ -45,7 +45,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfigurationProperties> {
@@ -60,7 +59,7 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
         final Map<String, String> sanitizedMetadata = metadata
             .entrySet()
             .stream()
-            .collect(Collectors.toMap(Entry::getKey,
+            .collect(Collectors.toMap(Map.Entry::getKey,
                 entry -> URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8),
                 (first, second) -> second,
                 LinkedHashMap::new));
@@ -115,7 +114,7 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
         final GetObjectRequest getObjectRequest =
             GetObjectRequest.builder().bucket(getConfiguration().getBucket()).key(sanitizedPath).build();
-        try (ResponseInputStream<GetObjectResponse> response = getS3Client().getObject(getObjectRequest)) {
+        try (final ResponseInputStream<GetObjectResponse> response = getS3Client().getObject(getObjectRequest)) {
             final URI uri = UriComponentsBuilder
                 .fromUri(getConfiguration().getEndpoint())
                 .path("/")

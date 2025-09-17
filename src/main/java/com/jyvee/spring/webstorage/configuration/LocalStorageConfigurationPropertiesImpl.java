@@ -32,13 +32,13 @@ import java.nio.file.Path;
 public class LocalStorageConfigurationPropertiesImpl implements LocalStorageConfigurationProperties {
 
     /** Base endpoint URI for uploaded files */
-    private final URI endpoint;
+    URI endpoint;
 
     /** Base path for uploaded files */
-    private final Path path;
+    Path path;
 
     /** Storage ID */
-    private final String storageId;
+    String storageId;
 
     public LocalStorageConfigurationPropertiesImpl(@NotNull final URI endpoint, @NotNull final Path path) {
         this.endpoint = endpoint;

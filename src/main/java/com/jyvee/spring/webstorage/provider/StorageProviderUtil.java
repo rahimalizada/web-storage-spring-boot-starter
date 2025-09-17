@@ -33,6 +33,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SequencedCollection;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -59,37 +60,42 @@ final class StorageProviderUtil {
     }
 
     static List<Path> listFiles(final Path path) throws IOException {
-        try (Stream<Path> stream = Files.find(path, Integer.MAX_VALUE, (filePath, fileAttr) -> fileAttr.isRegularFile())) {
+        try (final Stream<Path> stream = Files.find(path,
+            Integer.MAX_VALUE,
+            (filePath, fileAttr) -> fileAttr.isRegularFile())) {
             return stream.toList();
         } catch (final NoSuchFileException e) {
             return List.of();
         }
     }
 
-    static void setPermissions(final Path path, final String ownerName, final String groupName, final String permissionString) throws IOException {
-        try (FileSystem fileSystem = FileSystems.getDefault()) {
-            final UserPrincipal userPrincipal = fileSystem.getUserPrincipalLookupService().lookupPrincipalByName(ownerName);
-            final GroupPrincipal group = fileSystem.getUserPrincipalLookupService().lookupPrincipalByGroupName(groupName);
+    static void setPermissions(final Path path, final String ownerName, final String groupName,
+                               final String permissionString) throws IOException {
+        try (final FileSystem fileSystem = FileSystems.getDefault()) {
+            final UserPrincipal userPrincipal =
+                fileSystem.getUserPrincipalLookupService().lookupPrincipalByName(ownerName);
+            final GroupPrincipal group =
+                fileSystem.getUserPrincipalLookupService().lookupPrincipalByGroupName(groupName);
             Files.setOwner(path, userPrincipal);
             Files.getFileAttributeView(path, PosixFileAttributeView.class).setGroup(group);
             Files.setPosixFilePermissions(path, PosixFilePermissions.fromString(permissionString));
-        } catch (UserPrincipalNotFoundException | UnsupportedOperationException | FileSystemException ignored) {
+        } catch (final UserPrincipalNotFoundException | UnsupportedOperationException | FileSystemException ignored) {
         }
     }
 
     static List<Path> getMissingDirectories(final Path directoryPath) {
-        final List<Path> directories = new ArrayList<>();
+        final SequencedCollection<Path> directories = new ArrayList<>();
         Path root = directoryPath.getRoot();
         for (final Path path : directoryPath) {
             root = root.resolve(path);
-            directories.add(0, root);
+            directories.addFirst(root);
         }
         final List<Path> missingDirectories = directories.stream().takeWhile(path -> !Files.exists(path)).toList();
         return missingDirectories.reversed();
     }
 
-    static void createMissingDirectories(final Path directoryPath, final String owner, final String group, final String permissionString)
-        throws IOException {
+    static void createMissingDirectories(final Path directoryPath, final String owner, final String group,
+                                         final String permissionString) throws IOException {
         for (final Path directory : StorageProviderUtil.getMissingDirectories(directoryPath)) {
             Files.createDirectory(directory);
             StorageProviderUtil.setPermissions(directory, owner, group, permissionString);

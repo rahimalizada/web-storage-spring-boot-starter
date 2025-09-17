@@ -39,28 +39,28 @@ public class S3StorageConfigurationPropertiesImpl implements S3StorageConfigurat
      * https://serviceEndpoint.url/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://endpoint.url
      */
     @SuppressWarnings("JavadocLinkAsPlainText")
-    private final URI uri;
+    URI uri;
 
     /** S3 service endpoint URI */
-    private final URI serviceEndpoint;
+    URI serviceEndpoint;
 
     /** S3 region name */
-    private final String region;
+    String region;
 
     /** S3 bucket name */
-    private final String bucket;
+    String bucket;
 
     /** S3 access key */
-    private final String key;
+    String key;
 
     /** S3 secret key */
-    private final String secret;
+    String secret;
 
     /** Base endpoint URI for uploaded files */
-    private final URI endpoint;
+    URI endpoint;
 
     /** Storage ID */
-    private final String storageId;
+    String storageId;
 
     public S3StorageConfigurationPropertiesImpl(@NotNull final URI uri) {
 
