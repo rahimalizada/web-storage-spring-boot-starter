@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorageConfigurationProperties> {
 
@@ -70,7 +69,7 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
             Files.getFileAttributeView(filePath, UserDefinedFileAttributeView.class);
         view.write(CONTENT_TYPE_ATTRIBUTE, Charset.defaultCharset().encode(contentType));
         view.write(MD5_ATTRIBUTE, Charset.defaultCharset().encode(md5));
-        for (final Entry<String, String> entry : metadata.entrySet()) {
+        for (final Map.Entry<String, String> entry : metadata.entrySet()) {
             final String key = entry.getKey();
             final String value = entry.getValue();
             view.write(METADATA_ATTRIBUTE_PREFIX + key, Charset.defaultCharset().encode(value));

@@ -44,8 +44,8 @@ public final class ImageUtil {
 
     public static BufferedImage toBufferedImage(final byte[] bytes, final String contentType) throws IOException {
         final ImageReader imageReader = ImageUtil.getReader(contentType);
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-             ImageInputStream imageInputStream = ImageIO.createImageInputStream(byteArrayInputStream)) {
+        try (final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+             final ImageInputStream imageInputStream = ImageIO.createImageInputStream(byteArrayInputStream)) {
             imageReader.setInput(imageInputStream, false, false);
             return imageReader.read(0);
         } finally {
