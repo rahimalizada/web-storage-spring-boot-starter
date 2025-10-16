@@ -80,7 +80,7 @@
     <jmh.version>1.37</jmh.version>
     <testcontainers.version>1.21.3</testcontainers.version>
     <s3mock-testcontainers.version>4.9.1</s3mock-testcontainers.version>
-    <aws.java.sdk.version>2.35.7</aws.java.sdk.version>
+    <aws.java.sdk.version>2.35.8</aws.java.sdk.version>
 
     <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
     <maven-failsafe-plugin.version>3.5.4</maven-failsafe-plugin.version>
