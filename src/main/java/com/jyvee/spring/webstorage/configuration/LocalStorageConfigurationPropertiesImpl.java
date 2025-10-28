@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package com.jyvee.spring.webstorage.configuration;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-import software.amazon.awssdk.annotations.NotNull;
 
 import java.net.URI;
 import java.nio.file.Path;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,37 +19,33 @@ package com.jyvee.spring.webstorage.validator;
 import com.jyvee.spring.webstorage.configuration.StorageConfigurationProperties;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
 
 @Lazy
 @Component
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order
 @ConditionalOnBean(StorageConfigurationProperties.class)
-@SuppressWarnings("DefaultAnnotationParam")
 class StorageImageValidator implements StorageValidator {
 
     @Override
     public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType,
-        @NotNull final byte[] payload) {
-        return configuration instanceof final StorageImageValidatorConfiguration validatorConfiguration ?
-            validateInternal(validatorConfiguration, contentType, payload) : Map.of();
+                                        @NotNull final byte[] payload) {
+        return configuration instanceof final StorageImageValidatorConfiguration validatorConfiguration
+            ? validateInternal(validatorConfiguration, contentType, payload) : Map.of();
     }
 
-    private Map<String, String> validateInternal(final StorageImageValidatorConfiguration validatorConfiguration,
-        final String contentType,
-        @NotNull final byte[] payload) {
+    private static Map<String, String> validateInternal(final StorageImageValidatorConfiguration validatorConfiguration,
+                                                        final String contentType, @NotNull final byte[] payload) {
         if (validatorConfiguration.getMinWidth() == null && validatorConfiguration.getMinHeight() == null
-            && validatorConfiguration.getMaxWidth() == null
-            && validatorConfiguration.getMaxHeight() == null) {
+            && validatorConfiguration.getMaxWidth() == null && validatorConfiguration.getMaxHeight() == null) {
             return Map.of();
         }
         try {
@@ -64,12 +60,11 @@ class StorageImageValidator implements StorageValidator {
         }
     }
 
-    private Map<String, String> checkImage(final String contentType, final byte[] payload,
-        @Nullable final Integer minWidth, @Nullable final Integer minHeight,
-        @Nullable final Integer maxWidth, @Nullable final Integer maxHeight) throws IOException {
+    private static Map<String, String> checkImage(final String contentType, final byte[] payload,
+                                                  @Nullable final Integer minWidth, @Nullable final Integer minHeight,
+                                                  @Nullable final Integer maxWidth, @Nullable final Integer maxHeight)
+        throws IOException {
 
-        // final String extension = FileUtils.getFilenameExtension(filename).orElseThrow().toLowerCase(Locale.ENGLISH);
-        // final String resolvedContentType = MimeTypes.forExtension(extension).getTemplate();
         final BufferedImage bufferedImage = ImageUtil.toBufferedImage(payload, contentType);
         if (minWidth != null && bufferedImage.getWidth() < minWidth) {
             throw new IllegalArgumentException("Image width is too small");

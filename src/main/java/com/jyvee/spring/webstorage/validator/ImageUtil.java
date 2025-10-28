@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 @Slf4j
-public final class ImageUtil {
+final class ImageUtil {
 
     static {
         // noinspection SpellCheckingInspection
@@ -35,14 +35,14 @@ public final class ImageUtil {
 
     private ImageUtil() {}
 
-    public static ImageReader getReader(final String contentType) throws IOException {
+    static ImageReader getReader(final String contentType) throws IOException {
         if (ImageIO.getImageReadersByMIMEType(contentType).hasNext()) {
             return ImageIO.getImageReadersByMIMEType(contentType).next();
         }
         throw new IOException("Image reader for content type '" + contentType + "' was not found");
     }
 
-    public static BufferedImage toBufferedImage(final byte[] bytes, final String contentType) throws IOException {
+    static BufferedImage toBufferedImage(final byte[] bytes, final String contentType) throws IOException {
         final ImageReader imageReader = ImageUtil.getReader(contentType);
         try (final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
              final ImageInputStream imageInputStream = ImageIO.createImageInputStream(byteArrayInputStream)) {

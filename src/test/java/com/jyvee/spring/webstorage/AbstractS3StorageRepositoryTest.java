@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,18 +35,20 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class AbstractS3StorageRepositoryTest extends StorageRepositoryTest {
 
     static {
-        System.setProperty("software.amazon.awssdk.http.service.impl", "software.amazon.awssdk.http.apache.ApacheSdkHttpService");
+        System.setProperty("software.amazon.awssdk.http.service.impl",
+            "software.amazon.awssdk.http.apache.ApacheSdkHttpService");
     }
 
     @Container
-    private static final S3MockContainer s3Mock = new S3MockContainer("latest").withInitialBuckets("bucket");
+    private static final S3MockContainer S3_MOCK = new S3MockContainer("latest").withInitialBuckets("bucket");
 
     @DynamicPropertySource
     static void setProperties(final DynamicPropertyRegistry registry) {
-        s3Mock.start();
-        log.info("S3Mock test container uri: {}", s3Mock.getHttpEndpoint());
+        S3_MOCK.start();
+        log.info("S3Mock test container uri: {}", S3_MOCK.getHttpEndpoint());
         registry.add("web-storage.s3.uri",
-            () -> s3Mock.getHttpEndpoint() + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url/base");
+            () -> S3_MOCK.getHttpEndpoint()
+                  + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url/base");
     }
 
     AbstractS3StorageRepositoryTest(@Autowired final S3StorageRepository service) {

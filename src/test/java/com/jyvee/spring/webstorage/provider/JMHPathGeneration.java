@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,15 +38,24 @@ import java.util.concurrent.TimeUnit;
  * JMHPathGenerationTest.uriComponentsBuilder   thrpt    3  2414971.275 ±  96622.188  ops/s
  * </pre>
  */
+@SuppressWarnings("WeakerAccess")
 public class JMHPathGeneration {
 
     @Test
     @Disabled
-    public void benchmarkLauncher() throws RunnerException {
+    void benchmarkLauncher() throws RunnerException {
         final Options options = new OptionsBuilder().include(this.getClass().getName() + "\\..*") //
-            .warmupTime(TimeValue.seconds(10)).warmupIterations(2)//
-            .measurementTime(TimeValue.seconds(20)).measurementIterations(3)//
-            .mode(Mode.Throughput).timeUnit(TimeUnit.SECONDS).forks(1).shouldFailOnError(true).shouldDoGC(true).timeout(TimeValue.minutes(3)).build();
+                                                    .warmupTime(TimeValue.seconds(10))
+                                                    .warmupIterations(2)//
+                                                    .measurementTime(TimeValue.seconds(20))
+                                                    .measurementIterations(3)//
+                                                    .mode(Mode.Throughput)
+                                                    .timeUnit(TimeUnit.SECONDS)
+                                                    .forks(1)
+                                                    .shouldFailOnError(true)
+                                                    .shouldDoGC(true)
+                                                    .timeout(TimeValue.minutes(3))
+                                                    .build();
         new Runner(options).run();
     }
 
@@ -62,17 +71,23 @@ public class JMHPathGeneration {
     }
 
     @Benchmark
-    public final void uriComponentsBuilder(final BenchmarkState benchmarkState, final Blackhole blackhole) {
-        blackhole.consume(UriComponentsBuilder.fromPath(benchmarkState.basePath)
-            .pathSegment(benchmarkState.checksum.substring(0, 1), benchmarkState.checksum.substring(1, 2), benchmarkState.checksum, benchmarkState.filename)
-            .build().toUriString());
+    public static void uriComponentsBuilder(final BenchmarkState benchmarkState, final Blackhole blackhole) {
+        blackhole.consume(UriComponentsBuilder
+            .fromPath(benchmarkState.basePath)
+            .pathSegment(benchmarkState.checksum.substring(0, 1),
+                benchmarkState.checksum.substring(1, 2),
+                benchmarkState.checksum,
+                benchmarkState.filename)
+            .build()
+            .toUriString());
     }
 
     @Benchmark
-    public final void sanitizedStringConcat(final BenchmarkState benchmarkState, final Blackhole blackhole) {
+    public static void sanitizedStringConcat(final BenchmarkState benchmarkState, final Blackhole blackhole) {
         blackhole.consume(
-            StorageProviderUtil.sanitizePath(benchmarkState.basePath) + "/" + benchmarkState.checksum.charAt(0) + "/" + benchmarkState.checksum.charAt(1) + "/"
-            + benchmarkState.checksum + "/" + StorageProviderUtil.sanitizePath(benchmarkState.filename));
+            StorageProviderUtil.sanitizePath(benchmarkState.basePath) + "/" + benchmarkState.checksum.charAt(0) + "/"
+            + benchmarkState.checksum.charAt(1) + "/" + benchmarkState.checksum + "/"
+            + StorageProviderUtil.sanitizePath(benchmarkState.filename));
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Rahim Alizada
+ * Copyright (c) 2024-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 
 package com.jyvee.spring.webstorage.configuration;
 
+import java.net.URI;
+
 public interface S3StorageConfigurationProperties extends StorageConfigurationProperties {
 
-    java.net.URI getUri();
+    URI getUri();
 
-    java.net.URI getServiceEndpoint();
+    URI getServiceEndpoint();
 
     String getRegion();
 

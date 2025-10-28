@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,15 +35,15 @@ import java.util.stream.Stream;
 class StorageProviderUtilTest {
 
     @SuppressWarnings("SpellCheckingInspection")
-    public static final String PERMISSION_STR = "rwxr-xr-x";
+    private static final String PERMISSION_STR = "rwxr-xr-x";
 
     @Test
-    public void sanitizePath_validArgs_validResult() {
+    void sanitizePath_validArgs_validResult() {
         Assertions.assertEquals("path/filename.ext", StorageProviderUtil.sanitizePath("/path/filename.ext"));
         Assertions.assertEquals("path/filename.ext", StorageProviderUtil.sanitizePath("path/filename.ext"));
-        // noinspection SpellCheckingInspection
         Assertions.assertEquals("path/______________________________/______________________________filename.ext",
-            StorageProviderUtil.sanitizePath("/path/ФотографияƏğ ?!!~*&<>$# {}-+()/ФотографияƏğ ?!!~*&<>$# {}-+()filename.ext"));
+            StorageProviderUtil.sanitizePath(
+                "/path/ФотографияƏğ ?!!~*&<>$# {}-+()/ФотографияƏğ ?!!~*&<>$# {}-+()filename.ext"));
 
         Assertions.assertEquals("_path/filename.ext", StorageProviderUtil.sanitizePath("/ path/filename.ext"));
         Assertions.assertEquals("_path/filename.ext", StorageProviderUtil.sanitizePath(" path/filename.ext"));
@@ -64,7 +64,7 @@ class StorageProviderUtilTest {
         Files.createFile(file2);
         Assertions.assertTrue(StorageProviderUtil.listFiles(tempDirectory).containsAll(Set.of(file1, file2)));
 
-        try (Stream<Path> pathStream = Files.walk(tempDirectory)) {
+        try (final Stream<Path> pathStream = Files.walk(tempDirectory)) {
             pathStream.sorted(Comparator.reverseOrder()).forEach(path -> {
                 try {
                     Files.deleteIfExists(path);
@@ -77,8 +77,9 @@ class StorageProviderUtilTest {
     }
 
     @Test
-    public void setPermissions_validArgs_ok() throws IOException {
-        final boolean isWindows = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH).startsWith("windows");
+    void setPermissions_validArgs_ok() throws IOException {
+        final boolean isWindows =
+            System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH).startsWith("windows");
         final String principalName = isWindows ? System.getProperty("user.name") : "www-data";
 
         final Path tempFile = Files.createTempFile("", "");
@@ -90,25 +91,32 @@ class StorageProviderUtilTest {
     }
 
     @Test
-    public void getMissingDirectories_validArgs_ok() throws IOException {
+    void getMissingDirectories_validArgs_ok() throws IOException {
         final Path tempDirectory = Files.createTempDirectory("");
         final Path directory = tempDirectory.resolve("a/b/c/d");
         Assertions.assertTrue(StorageProviderUtil.getMissingDirectories(tempDirectory).isEmpty());
-        Assertions.assertTrue(StorageProviderUtil.getMissingDirectories(directory)
-            .containsAll(List.of(tempDirectory.resolve("a"), tempDirectory.resolve("a/b"), tempDirectory.resolve("a/b/c"), tempDirectory.resolve("a/b/c/d"))));
+        Assertions.assertTrue(StorageProviderUtil
+            .getMissingDirectories(directory)
+            .containsAll(List.of(tempDirectory.resolve("a"),
+                tempDirectory.resolve("a/b"),
+                tempDirectory.resolve("a/b/c"),
+                tempDirectory.resolve("a/b/c/d"))));
     }
 
     @Test
-    public void createMissingDirectories_validArgs_ok() throws IOException {
-        final boolean isWindows = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH).startsWith("windows");
+    void createMissingDirectories_validArgs_ok() throws IOException {
+        final boolean isWindows =
+            System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH).startsWith("windows");
         final String principalName = isWindows ? System.getProperty("user.name") : "www-data";
 
         final Path tempDirectory = Files.createTempDirectory("");
         final Path directory = tempDirectory.resolve("a/b/c/d");
         StorageProviderUtil.createMissingDirectories(directory, principalName, principalName, PERMISSION_STR);
 
-        final List<Path> createdDirectories =
-            List.of(tempDirectory.resolve("a"), tempDirectory.resolve("a/b"), tempDirectory.resolve("a/b/c"), tempDirectory.resolve("a/b/c/d"));
+        final List<Path> createdDirectories = List.of(tempDirectory.resolve("a"),
+            tempDirectory.resolve("a/b"),
+            tempDirectory.resolve("a/b/c"),
+            tempDirectory.resolve("a/b/c/d"));
 
         Assertions.assertTrue(Files.exists(tempDirectory));
         for (final Path createdDirectory : createdDirectories) {
@@ -121,24 +129,27 @@ class StorageProviderUtilTest {
     }
 
     @Test
-    public void md5_validArgs_ok() {
+    void md5_validArgs_ok() {
         Assertions.assertEquals("d41d8cd98f00b204e9800998ecf8427e", StorageProviderUtil.md5(new byte[]{}));
-        Assertions.assertEquals("098f6bcd4621d373cade4e832627b4f6", StorageProviderUtil.md5("test".getBytes(StandardCharsets.UTF_8)));
+        Assertions.assertEquals("098f6bcd4621d373cade4e832627b4f6",
+            StorageProviderUtil.md5("test".getBytes(StandardCharsets.UTF_8)));
     }
 
     // On linux, the owner of the created directory is the current user, not the www-data user
     @SuppressWarnings("unused")
     private static void checkPathPermissions(final Path path, final String principalName) throws IOException {
-        final boolean isWindows = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH).startsWith("windows");
+        final boolean isWindows =
+            System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH).startsWith("windows");
 
-        Assertions.assertTrue(
-            isWindows ? Files.getOwner(path).getName().endsWith("\\" + principalName) : Files.getOwner(path).getName().endsWith(principalName));
+        Assertions.assertTrue(isWindows ? Files.getOwner(path).getName().endsWith("\\" + principalName)
+            : Files.getOwner(path).getName().endsWith(principalName));
 
         if (!isWindows) {
             final Set<PosixFilePermission> posixFilePermissions = Files.getPosixFilePermissions(path);
             Assertions.assertEquals(PERMISSION_STR, PosixFilePermissions.toString(posixFilePermissions));
 
-            final PosixFileAttributeView fileAttributeView = Files.getFileAttributeView(path, PosixFileAttributeView.class);
+            final PosixFileAttributeView fileAttributeView =
+                Files.getFileAttributeView(path, PosixFileAttributeView.class);
             Assertions.assertEquals("www-data", fileAttributeView.readAttributes().group().getName());
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,29 +29,30 @@ class StorageContentTypeValidatorTest {
 
     private static byte[] payload;
 
-    final StorageContentTypeValidator validator = new StorageContentTypeValidator();
+    private final StorageContentTypeValidator validator = new StorageContentTypeValidator();
 
     @BeforeAll
-    public static void beforeAll() throws IOException {
+    static void beforeAll() throws IOException {
         payload = Files.readAllBytes(new ClassPathResource("image.jpeg").getFile().toPath());
     }
 
     @Test
-    public void validate_ValidArgs_Ok() {
+    void validate_ValidArgs_Ok() {
         Assertions.assertTrue(this.validator.validate(WebFileType.NO_CHECK, "image/jpeg", payload).isEmpty());
         Assertions.assertTrue(this.validator.validate(WebFileType.VALID, "image/jpeg", payload).isEmpty());
     }
 
     @Test
-    public void validate_invalidConfig_emptyMap() {
+    void validate_invalidConfig_emptyMap() {
         Assertions.assertTrue(this.validator.validate(new Object(), "image/jpeg", payload).isEmpty());
         Assertions.assertTrue(this.validator.validate(new Object(), "unused", payload).isEmpty());
     }
 
     @Test
-    public void validate_InvalidArgs_Exception() {
+    void validate_InvalidArgs_Exception() {
         Assertions.assertEquals("Content type is not allowed",
-            Assertions.assertThrows(IllegalArgumentException.class,
+            Assertions
+                .assertThrows(IllegalArgumentException.class,
                     () -> this.validator.validate(WebFileType.INVALID_MIN_SIZE, "image/bmp", payload))
                 .getMessage());
 

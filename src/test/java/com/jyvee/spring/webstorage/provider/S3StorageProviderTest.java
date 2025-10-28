@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,23 +37,16 @@ class S3StorageProviderTest extends AbstractStorageProviderTest {
     }
 
     @Container
-    private static final S3MockContainer s3Mock = new S3MockContainer("latest").withInitialBuckets("bucket");
+    private static final S3MockContainer S3_MOCK = new S3MockContainer("latest").withInitialBuckets("bucket");
 
     @BeforeAll
-    public void beforeAll() {
+    void beforeAll() {
         final S3StorageConfigurationProperties configurationProperties =
             new S3StorageConfigurationPropertiesImpl(URI.create(
-                s3Mock.getHttpEndpoint() + "/?region=region&bucket=bucket&key=key&secret"
+                S3_MOCK.getHttpEndpoint() + "/?region=region&bucket=bucket&key=key&secret"
                 + "=secret&endpoint=https://site.url/base"));
         setProvider(new S3StorageProvider(configurationProperties));
 
-        // final String key = System.getenv("TRADING_GC_DEV_S3_KEY");
-        // final String secret = System.getenv("TRADING_GC_DEV_S3_SECRET");
-        // setEndpoint("https://region.digitaloceanspaces.com");
-        // setHttpEndpoint("https://site.url/base");
-        // setProvider(new TestS3StorageProvider(new S3StorageConfiguration2(
-        // URI.create(getEndpoint() + "/?region=region&bucket=bucket&key=" + key +
-        // "&secret=" + secret + "&endpoint=https://site.url/base"))));
     }
 
 }

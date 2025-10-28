@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@
 package com.jyvee.spring.webstorage.configuration;
 
 import com.jyvee.spring.test.webstorage.TestApplication;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 
 @SpringBootTest(classes = TestApplication.class,
@@ -35,7 +35,7 @@ class S3StorageConfigurationPropertiesTest {
     private S3StorageConfigurationProperties config;
 
     @Test
-    public void testMethod() {
+    void testMethod() {
         Assertions.assertEquals("https://s3.url", this.config.getServiceEndpoint().toString());
         Assertions.assertEquals("REGION", this.config.getRegion());
         Assertions.assertEquals("BUCKET", this.config.getBucket());
@@ -46,7 +46,7 @@ class S3StorageConfigurationPropertiesTest {
 
     @Test
     @SuppressWarnings("DataFlowIssue")
-    public void parser_InvalidURI_Exception() {
+    void parser_InvalidURI_Exception() {
 
         Assertions.assertThrows(NullPointerException.class, () -> new S3StorageConfigurationPropertiesImpl(null));
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -108,8 +108,8 @@ class S3StorageConfigurationPropertiesTest {
 
     }
 
-    private URI buildUri(@Nullable final String region, @Nullable final String bucket, @Nullable final String key,
-                         @Nullable final String secret, @Nullable final String url) {
+    private static URI buildUri(@Nullable final String region, @Nullable final String bucket,
+                                @Nullable final String key, @Nullable final String secret, @Nullable final String url) {
         final UriComponentsBuilder builder = UriComponentsBuilder.newInstance().scheme("https").host("s3.url");
         if (region != null) {
             builder.queryParam("region", region);

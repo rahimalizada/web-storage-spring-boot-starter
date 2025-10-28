@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ public interface StorageProvider<T, S extends StorageConfigurationProperties> {
     S getConfiguration();
 
     @SuppressWarnings("checkstyle:ParameterNumber")
-    T newInstance(URI uri, String storageId, String path, String contentType, long size, String checksum, Map<String, String> metadata,
-        Instant timestamp);
+    T newInstance(URI uri, String storageId, String path, String contentType, long size, String checksum,
+                  Map<String, String> metadata, Instant timestamp);
 
     List<String> list(String path) throws IOException;
 

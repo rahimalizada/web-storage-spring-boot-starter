@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,18 +28,18 @@ import java.nio.file.Files;
 class ImageUtilTest {
 
     @Test
-    public void getReader_validArgs_ok() throws IOException {
+    void getReader_validArgs_ok() throws IOException {
         Assertions.assertNotNull(ImageUtil.getReader("image/jpeg"));
         Assertions.assertNotNull(ImageUtil.getReader("image/png"));
     }
 
     @Test
-    public void getReader_invalidArgs_exception() {
+    void getReader_invalidArgs_exception() {
         Assertions.assertThrows(IOException.class, () -> ImageUtil.getReader("image/invalid"));
     }
 
     @Test
-    public void toBufferedImage_validArgs_ok() throws IOException {
+    void toBufferedImage_validArgs_ok() throws IOException {
         final byte[] payload = Files.readAllBytes(new ClassPathResource("image.jpeg").getFile().toPath());
         final BufferedImage bufferedImage = ImageUtil.toBufferedImage(payload, "image/jpeg");
 
@@ -49,12 +49,14 @@ class ImageUtilTest {
     }
 
     @Test
-    public void toBufferedImage_invalidArgs_exception() throws IOException {
+    void toBufferedImage_invalidArgs_exception() throws IOException {
         final byte[] payload = Files.readAllBytes(new ClassPathResource("image.jpeg").getFile().toPath());
 
         Assertions.assertThrows(IOException.class, () -> ImageUtil.toBufferedImage(payload, "image/invalid"));
-        Assertions.assertThrows(IOException.class, () -> ImageUtil.toBufferedImage("test".getBytes(StandardCharsets.UTF_8), "image/invalid"));
-        Assertions.assertThrows(IOException.class, () -> ImageUtil.toBufferedImage("test".getBytes(StandardCharsets.UTF_8), "image/jpeg"));
+        Assertions.assertThrows(IOException.class,
+            () -> ImageUtil.toBufferedImage("test".getBytes(StandardCharsets.UTF_8), "image/invalid"));
+        Assertions.assertThrows(IOException.class,
+            () -> ImageUtil.toBufferedImage("test".getBytes(StandardCharsets.UTF_8), "image/jpeg"));
 
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,17 +35,20 @@ import java.util.Optional;
 
 public interface StorageRepository<T, S extends StorageConfigurationProperties> extends StorageProvider<T, S> {
 
-    default List<T> save(final FileType fileType, final Collection<? extends MultipartFile> multipartFiles) throws IOException {
+    default List<T> save(final FileType fileType, final Collection<? extends MultipartFile> multipartFiles)
+        throws IOException {
         if (multipartFiles.isEmpty()) {
             throw new IllegalArgumentException("Files are missing");
         }
 
         final List<T> httpFiles = new ArrayList<>();
         for (final MultipartFile multipartFile : multipartFiles) {
-            final String contentType =
-                Optional.ofNullable(multipartFile.getContentType()).orElseThrow(() -> new IllegalArgumentException("ContentType is missing"));
-            final String fileName =
-                Optional.ofNullable(multipartFile.getOriginalFilename()).orElseThrow(() -> new IllegalArgumentException("File name is missing"));
+            final String contentType = Optional
+                .ofNullable(multipartFile.getContentType())
+                .orElseThrow(() -> new IllegalArgumentException("ContentType is missing"));
+            final String fileName = Optional
+                .ofNullable(multipartFile.getOriginalFilename())
+                .orElseThrow(() -> new IllegalArgumentException("File name is missing"));
             final T httpFile = save(fileType, fileName, contentType, multipartFile.getBytes(), new LinkedHashMap<>());
             httpFiles.add(httpFile);
         }
@@ -53,7 +56,7 @@ public interface StorageRepository<T, S extends StorageConfigurationProperties> 
     }
 
     default T save(final FileType fileType, final String path, final String contentType, final byte[] payload,
-        final Map<String, String> metadata) throws IOException {
+                   final Map<String, String> metadata) throws IOException {
 
         final Path relativePath = Paths.get(path);
 
@@ -62,7 +65,10 @@ public interface StorageRepository<T, S extends StorageConfigurationProperties> 
         final Map<String, String> updatedMetadata = new LinkedHashMap<>(metadata);
         updatedMetadata.put("filename", relativePath.getFileName().toString());
         updatedMetadata.put("fileType", fileType.name());
-        getValidators().stream().map(validator -> validator.validate(fileType, contentType, payload)).forEach(updatedMetadata::putAll);
+        getValidators()
+            .stream()
+            .map(validator -> validator.validate(fileType, contentType, payload))
+            .forEach(updatedMetadata::putAll);
 
         return this.save(storagePath, contentType, payload, updatedMetadata);
     }
