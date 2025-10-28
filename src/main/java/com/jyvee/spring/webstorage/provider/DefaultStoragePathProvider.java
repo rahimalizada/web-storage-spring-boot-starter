@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,13 @@ public class DefaultStoragePathProvider implements StoragePathProvider {
         if (relativePath.getParent() != null) {
             relativePath.getParent().iterator().forEachRemaining(path -> builder.path(path.toString()).path("/"));
         }
-        return builder.pathSegment(checksum.substring(0, 1), checksum.substring(1, 2), checksum, relativePath.getFileName().toString()).build().toUriString();
+        return builder
+            .pathSegment(checksum.substring(0, 1),
+                checksum.substring(1, 2),
+                checksum,
+                relativePath.getFileName().toString())
+            .build()
+            .toUriString();
     }
 
 }

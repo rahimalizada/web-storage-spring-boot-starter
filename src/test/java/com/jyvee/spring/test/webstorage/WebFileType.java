@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,15 @@ import com.jyvee.spring.webstorage.validator.StorageContentTypeValidatorConfigur
 import com.jyvee.spring.webstorage.validator.StorageImageValidatorConfiguration;
 import com.jyvee.spring.webstorage.validator.StorageSizeValidatorConfiguration;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.nio.file.Path;
 import java.util.Set;
 
 @Getter
-public enum WebFileType implements FileType, StorageSizeValidatorConfiguration, StorageContentTypeValidatorConfiguration, StorageImageValidatorConfiguration {
+public enum WebFileType
+    implements FileType, StorageSizeValidatorConfiguration, StorageContentTypeValidatorConfiguration,
+    StorageImageValidatorConfiguration {
 
     NO_CHECK("No check", "/test/files", null, null, null, null, null, null, null, null, null),
 
@@ -35,17 +37,77 @@ public enum WebFileType implements FileType, StorageSizeValidatorConfiguration, 
 
     VALID("Valid", "/test/files", Set.of("image/jpeg", "image/png"), 1024L, 20 * 1024L, 100, 100, 700, 700, null, null),
 
-    INVALID_MIN_SIZE("Invalid minimum size", "/test/files", Set.of("image/jpeg", "image/png"), 20 * 1024L, 10 * 1024L, 100, 100, 700, 700, null, null),
+    INVALID_MIN_SIZE("Invalid minimum size",
+        "/test/files",
+        Set.of("image/jpeg", "image/png"),
+        20 * 1024L,
+        10 * 1024L,
+        100,
+        100,
+        700,
+        700,
+        null,
+        null),
 
-    INVALID_MAX_SIZE("Invalid maximum size", "/test/files", Set.of("image/jpeg", "image/png"), 1024L, 1024L, 100, 100, 700, 700, null, null),
+    INVALID_MAX_SIZE("Invalid maximum size",
+        "/test/files",
+        Set.of("image/jpeg", "image/png"),
+        1024L,
+        1024L,
+        100,
+        100,
+        700,
+        700,
+        null,
+        null),
 
-    INVALID_MIN_WIDTH("TInvalid minimum width", "/test/files", Set.of("image/jpeg", "image/png"), 1024L, 10 * 1024L, 1000, 100, 700, 700, null, null),
+    INVALID_MIN_WIDTH("TInvalid minimum width",
+        "/test/files",
+        Set.of("image/jpeg", "image/png"),
+        1024L,
+        10 * 1024L,
+        1000,
+        100,
+        700,
+        700,
+        null,
+        null),
 
-    INVALID_MIN_HEIGHT("Invalid minimum height", "/test/files", Set.of("image/jpeg", "image/png"), 1024L, 10 * 1024L, 100, 1000, 700, 700, null, null),
+    INVALID_MIN_HEIGHT("Invalid minimum height",
+        "/test/files",
+        Set.of("image/jpeg", "image/png"),
+        1024L,
+        10 * 1024L,
+        100,
+        1000,
+        700,
+        700,
+        null,
+        null),
 
-    INVALID_MAX_WIDTH("Invalid maximum width", "/test/files", Set.of("image/jpeg", "image/png"), 1024L, 10 * 1024L, 100, 100, 100, 700, null, null),
+    INVALID_MAX_WIDTH("Invalid maximum width",
+        "/test/files",
+        Set.of("image/jpeg", "image/png"),
+        1024L,
+        10 * 1024L,
+        100,
+        100,
+        100,
+        700,
+        null,
+        null),
 
-    INVALID_MAX_HEIGHT("Invalid maximum height", "/test/files", Set.of("image/jpeg", "image/png"), 1024L, 10 * 1024L, 100, 100, 700, 100, null, null);
+    INVALID_MAX_HEIGHT("Invalid maximum height",
+        "/test/files",
+        Set.of("image/jpeg", "image/png"),
+        1024L,
+        10 * 1024L,
+        100,
+        100,
+        700,
+        100,
+        null,
+        null);
 
     private final String title;
 
@@ -79,9 +141,10 @@ public enum WebFileType implements FileType, StorageSizeValidatorConfiguration, 
     private final Integer scaleToHeight;
 
     @SuppressWarnings("ParameterNumber")
-    WebFileType(final String title, final String path, @Nullable final Set<String> contentTypes, @Nullable final Long minSize, @Nullable final Long maxSize,
-        @Nullable final Integer minWidth, @Nullable final Integer minHeight, @Nullable final Integer maxWidth, @Nullable final Integer maxHeight,
-        @Nullable final Integer scaleToWidth, @Nullable final Integer scaleToHeight) {
+    WebFileType(final String title, final String path, @Nullable final Set<String> contentTypes,
+                @Nullable final Long minSize, @Nullable final Long maxSize, @Nullable final Integer minWidth,
+                @Nullable final Integer minHeight, @Nullable final Integer maxWidth, @Nullable final Integer maxHeight,
+                @Nullable final Integer scaleToWidth, @Nullable final Integer scaleToHeight) {
         this.title = title;
         this.path = Path.of(path);
         this.contentTypes = contentTypes;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package com.jyvee.spring.webstorage.configuration;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.util.UriComponentsBuilder;
-import software.amazon.awssdk.annotations.NotNull;
 
 import java.net.URI;
 import java.net.URLDecoder;
@@ -74,17 +74,12 @@ public class S3StorageConfigurationPropertiesImpl implements S3StorageConfigurat
             .toUri();
         final Map<String, String> queryParamsMap =
             UriComponentsBuilder.fromUri(uri).build().getQueryParams().toSingleValueMap();
-        // final Map<String, String> queryParamsMap = new URIBuilder(uri).getQueryParams().stream()
-        //     .collect(Collectors.toMap(pair -> pair.getName().toLowerCase(Locale.ENGLISH), NameValuePair::getValue,
-        //     (first, second) -> second));
 
         this.region = getParameter(queryParamsMap, "region");
         this.bucket = getParameter(queryParamsMap, "bucket");
         this.key = getParameter(queryParamsMap, "key");
         this.secret = getParameter(queryParamsMap, "secret");
         final String httpEndpointStr = getParameter(queryParamsMap, "endpoint").strip();
-        // Trim trailing slash
-        // this.httpEndpoint = URI.create(StringUtils.trimTrailingCharacter(httpEndpointStr, '/'));
         this.endpoint = URI.create(httpEndpointStr);
 
         this.storageId = UriComponentsBuilder
@@ -95,7 +90,7 @@ public class S3StorageConfigurationPropertiesImpl implements S3StorageConfigurat
             .toUriString();
     }
 
-    private String getParameter(final Map<String, String> queryParamsMap, final String parameterName) {
+    private static String getParameter(final Map<String, String> queryParamsMap, final String parameterName) {
         final String value = queryParamsMap.get(parameterName);
         if (value == null) {
             throw new IllegalArgumentException("Endpoint URI should contain '" + parameterName + "' parameter");
@@ -106,22 +101,5 @@ public class S3StorageConfigurationPropertiesImpl implements S3StorageConfigurat
         }
         return decodedValue;
     }
-
-    // private Map<String, String> parseQuery(final URI uri) {
-    //     if (uri.getQuery() == null || uri.getQuery().isBlank()) {
-    //         return Map.of();
-    //     }
-    //     return Arrays.stream(uri.getQuery().split("&")).map(this::splitQueryParameter).filter(Objects::nonNull)
-    //         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (first, second) -> second,
-    //         LinkedHashMap::new));
-    // }
-    //
-    // public Map.Entry<String, String> splitQueryParameter(final String queryParameter) {
-    //     final int index = queryParameter.indexOf('=');
-    //     final String queryKey = index > 0 ? queryParameter.substring(0, index) : queryParameter;
-    //     final String queryValue = index > 0 && queryParameter.length() > index + 1 ? queryParameter.substring
-    //     (index + 1) : null;
-    //     return queryValue != null ? Map.entry(queryKey, queryValue) : null;
-    // }
 
 }

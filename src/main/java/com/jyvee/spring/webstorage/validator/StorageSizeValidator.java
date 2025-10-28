@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,13 @@ class StorageSizeValidator implements StorageValidator {
 
     @Override
     public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType,
-        @NotNull final byte[] payload) {
+                                        @NotNull final byte[] payload) {
         return configuration instanceof final StorageSizeValidatorConfiguration validatorConfiguration
-            ? validateInternal(validatorConfiguration, payload) :
-            Map.of();
+            ? validateInternal(validatorConfiguration, payload) : Map.of();
     }
 
-    private Map<String, String> validateInternal(final StorageSizeValidatorConfiguration validatorConfiguration,
-        final byte[] payload) {
+    private static Map<String, String> validateInternal(final StorageSizeValidatorConfiguration validatorConfiguration,
+                                                        final byte[] payload) {
         if (validatorConfiguration.getMaxSize() != null && payload.length > validatorConfiguration.getMaxSize()) {
             throw new IllegalArgumentException("File size is too big");
         }

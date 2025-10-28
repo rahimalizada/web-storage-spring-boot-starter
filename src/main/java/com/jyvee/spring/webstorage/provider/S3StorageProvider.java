@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
                 stripEtag(response.response().eTag()),
                 response.response().metadata(),
                 response.response().lastModified());
-        } catch (final SdkException e) {
+        } catch (@SuppressWarnings("OverlyBroadCatchBlock") final SdkException e) {
             throw new IOException(e);
         }
     }
@@ -176,7 +176,7 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
         getS3Client().copyObject(request);
     }
 
-    private String stripEtag(final String eTag) {
+    private static String stripEtag(final String eTag) {
         if (eTag.startsWith("\"") && eTag.endsWith("\"")) {
             return eTag.substring(1, eTag.length() - 1);
         }

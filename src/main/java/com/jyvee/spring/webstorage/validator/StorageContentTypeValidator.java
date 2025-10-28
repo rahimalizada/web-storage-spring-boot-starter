@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,14 +35,15 @@ class StorageContentTypeValidator implements StorageValidator {
 
     @Override
     public Map<String, String> validate(@NotNull final Object configuration, @NotBlank final String contentType,
-        @NotNull final byte[] payload) {
-        return configuration instanceof final StorageContentTypeValidatorConfiguration validatorConfiguration ?
-            validateInternal(validatorConfiguration, contentType) : Map.of();
+                                        @NotNull final byte[] payload) {
+        return configuration instanceof final StorageContentTypeValidatorConfiguration validatorConfiguration
+            ? validateInternal(validatorConfiguration, contentType) : Map.of();
     }
 
-    private Map<String, String> validateInternal(final StorageContentTypeValidatorConfiguration validatorConfiguration,
-        final String contentType) {
-        if (validatorConfiguration.getContentTypes() != null && !validatorConfiguration.getContentTypes()
+    private static Map<String, String> validateInternal(
+        final StorageContentTypeValidatorConfiguration validatorConfiguration, final String contentType) {
+        if (validatorConfiguration.getContentTypes() != null && !validatorConfiguration
+            .getContentTypes()
             .contains(contentType)) {
             throw new IllegalArgumentException("Content type is not allowed");
         }

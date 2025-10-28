@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import java.nio.file.Path;
 class LocalStorageProviderTest extends AbstractStorageProviderTest {
 
     @BeforeAll
-    public void beforeAll() throws IOException {
+    void beforeAll() throws IOException {
         final Path basePath = Files.createTempDirectory("");
 
         final LocalStorageConfigurationProperties configurationProperties =

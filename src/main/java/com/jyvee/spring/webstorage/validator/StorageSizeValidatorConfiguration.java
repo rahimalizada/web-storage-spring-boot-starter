@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 
 package com.jyvee.spring.webstorage.validator;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface StorageSizeValidatorConfiguration {
 
-    @Nullable
-    Long getMaxSize();
+    @Nullable Long getMaxSize();
 
-    @Nullable
-    Long getMinSize();
+    @Nullable Long getMinSize();
 
 }

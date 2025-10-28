@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2024 Rahim Alizada
+ * Copyright (c) 2023-2025 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -146,7 +146,8 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
         Files.move(fromFilePath, toFilePath, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    private String readAttribute(final UserDefinedFileAttributeView view, final String attribute) throws IOException {
+    private static String readAttribute(final UserDefinedFileAttributeView view, final String attribute)
+        throws IOException {
         final ByteBuffer byteBuffer = ByteBuffer.allocate(view.size(attribute));
         view.read(attribute, byteBuffer);
         byteBuffer.flip();
