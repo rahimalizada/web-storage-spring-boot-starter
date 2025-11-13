@@ -25,6 +25,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.Locale;
 import java.util.Map;
 
 @Lazy
@@ -42,9 +43,14 @@ class StorageContentTypeValidator implements StorageValidator {
 
     private static Map<String, String> validateInternal(
         final StorageContentTypeValidatorConfiguration validatorConfiguration, final String contentType) {
+        final String sanitizedContentType = contentType.indexOf(';') != -1 ? contentType
+            .substring(0, contentType.indexOf(';'))
+            .strip()
+            .toLowerCase(Locale.ENGLISH) : contentType.strip().toLowerCase(Locale.ENGLISH);
+        
         if (validatorConfiguration.getContentTypes() != null && !validatorConfiguration
             .getContentTypes()
-            .contains(contentType)) {
+            .contains(sanitizedContentType)) {
             throw new IllegalArgumentException("Content type is not allowed");
         }
         return Map.of();
