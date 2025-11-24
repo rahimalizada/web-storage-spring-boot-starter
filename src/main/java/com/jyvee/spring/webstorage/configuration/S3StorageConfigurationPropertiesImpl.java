@@ -17,7 +17,7 @@
 package com.jyvee.spring.webstorage.configuration;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -28,7 +28,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-@Value
+@Getter
 @Validated
 @ConfigurationProperties(prefix = "web-storage.s3")
 @ConditionalOnProperty(prefix = "web-storage.s3", name = "uri")
@@ -39,28 +39,28 @@ public class S3StorageConfigurationPropertiesImpl implements S3StorageConfigurat
      * https://serviceEndpoint.url/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://endpoint.url
      */
     @SuppressWarnings("JavadocLinkAsPlainText")
-    URI uri;
+    private final URI uri;
 
     /** S3 service endpoint URI */
-    URI serviceEndpoint;
+    private final URI serviceEndpoint;
 
     /** S3 region name */
-    String region;
+    private final String region;
 
     /** S3 bucket name */
-    String bucket;
+    private final String bucket;
 
     /** S3 access key */
-    String key;
+    private final String key;
 
     /** S3 secret key */
-    String secret;
+    private final String secret;
 
     /** Base endpoint URI for uploaded files */
-    URI endpoint;
+    private final URI endpoint;
 
     /** Storage ID */
-    String storageId;
+    private final String storageId;
 
     public S3StorageConfigurationPropertiesImpl(@NotNull final URI uri) {
 
