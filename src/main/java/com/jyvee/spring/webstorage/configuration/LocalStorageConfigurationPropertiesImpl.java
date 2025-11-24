@@ -17,7 +17,7 @@
 package com.jyvee.spring.webstorage.configuration;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.Value;
+import lombok.Getter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -25,20 +25,20 @@ import org.springframework.validation.annotation.Validated;
 import java.net.URI;
 import java.nio.file.Path;
 
-@Value
+@Getter
 @Validated
 @ConfigurationProperties(prefix = "web-storage.local")
 @ConditionalOnProperty(prefix = "web-storage.local", name = {"path", "endpoint"})
 public class LocalStorageConfigurationPropertiesImpl implements LocalStorageConfigurationProperties {
 
     /** Base endpoint URI for uploaded files */
-    URI endpoint;
+    private final URI endpoint;
 
     /** Base path for uploaded files */
-    Path path;
+    private final Path path;
 
     /** Storage ID */
-    String storageId;
+    private final String storageId;
 
     public LocalStorageConfigurationPropertiesImpl(@NotNull final URI endpoint, @NotNull final Path path) {
         this.endpoint = endpoint;

@@ -124,7 +124,7 @@
     <!--suppress VulnerableLibrariesLocal -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-web</artifactId>
+      <artifactId>spring-boot-starter-webmvc</artifactId>
       <optional>true</optional>
     </dependency>
 
@@ -173,7 +173,7 @@
 
     <dependency>
       <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
+      <artifactId>testcontainers-junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
 
