@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,14 @@
 package com.jyvee.spring.webstorage.provider;
 
 import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationProperties;
+import com.jyvee.spring.webstorage.provider.s3.S3RawCopyClient;
+import com.jyvee.spring.webstorage.provider.s3.S3RawDeleteClient;
+import com.jyvee.spring.webstorage.provider.s3.S3RawGetClient;
+import com.jyvee.spring.webstorage.provider.s3.S3RawGetResponse;
+import com.jyvee.spring.webstorage.provider.s3.S3RawListClient;
+import com.jyvee.spring.webstorage.provider.s3.S3RawPutClient;
+import com.jyvee.spring.webstorage.provider.s3.S3RawPutResponse;
 import org.springframework.web.util.UriComponentsBuilder;
-import software.amazon.awssdk.core.ResponseInputStream;
-import software.amazon.awssdk.core.exception.SdkException;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
-import software.amazon.awssdk.services.s3.model.Delete;
-import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Object;
-import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 
 import java.io.IOException;
 import java.net.URI;
@@ -49,131 +39,84 @@ import java.util.stream.Collectors;
 
 public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfigurationProperties> {
 
-    S3Client getS3Client();
-
     @Override
     default T save(final String path, final String contentType, final byte[] payload,
-                   final Map<String, String> metadata) {
+                   final Map<String, String> metadata) throws IOException {
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
 
         final Map<String, String> sanitizedMetadata = metadata
             .entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey,
-                entry -> URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8),
-                (first, second) -> second,
+                entry -> URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8), (_, second) -> second,
                 LinkedHashMap::new));
 
-        final PutObjectRequest request = PutObjectRequest
-            .builder()
-            .bucket(getConfiguration().getBucket())
-            .contentType(contentType)
-            .key(sanitizedPath)
-            .acl(ObjectCannedACL.PUBLIC_READ)
-            .metadata(sanitizedMetadata)
-            .build();
-        final RequestBody requestBody = RequestBody.fromBytes(payload);
+        final S3RawPutResponse putResponse =
+            new S3RawPutClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).putObject(sanitizedPath,
+                contentType, payload, sanitizedMetadata);
 
-        final PutObjectResponse putObject = getS3Client().putObject(request, requestBody);
         final URI uri = UriComponentsBuilder
             .fromUri(getConfiguration().getEndpoint())
             .path("/")
             .path(sanitizedPath)
             .build()
             .toUri();
-        return newInstance(uri,
-            getConfiguration().getStorageId(),
-            sanitizedPath,
-            contentType,
-            payload.length,
-            stripEtag(putObject.eTag()),
-            metadata,
-            Instant.now());
+
+        return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, contentType, payload.length,
+            stripEtag(putResponse.eTag()), metadata, Instant.now());
     }
 
     @Override
-    default List<String> list(final String path) {
-        final ListObjectsV2Request request = ListObjectsV2Request
-            .builder()
-            .bucket(getConfiguration().getBucket())
-            .prefix(StorageProviderUtil.sanitizePath(path))
-            .maxKeys(Integer.MAX_VALUE)
-            .build();
-
-        final ListObjectsV2Iterable listObjectsV2Paginator = getS3Client().listObjectsV2Paginator(request);
-        return listObjectsV2Paginator
-            .stream()
-            .map(ListObjectsV2Response::contents)
-            .flatMap(Collection::stream)
-            .map(S3Object::key)
-            .toList();
+    default List<String> list(final String path) throws IOException {
+        final String prefix = StorageProviderUtil.sanitizePath(path);
+        return new S3RawListClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).listObjects(prefix);
     }
 
     @Override
     default T load(final String path) throws IOException {
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
-        final GetObjectRequest getObjectRequest =
-            GetObjectRequest.builder().bucket(getConfiguration().getBucket()).key(sanitizedPath).build();
-        try (final ResponseInputStream<GetObjectResponse> response = getS3Client().getObject(getObjectRequest)) {
-            final URI uri = UriComponentsBuilder
-                .fromUri(getConfiguration().getEndpoint())
-                .path("/")
-                .path(sanitizedPath)
-                .build()
-                .toUri();
-            return newInstance(uri,
-                getConfiguration().getStorageId(),
-                sanitizedPath,
-                response.response().contentType(),
-                response.response().contentLength(),
-                stripEtag(response.response().eTag()),
-                response.response().metadata(),
-                response.response().lastModified());
-        } catch (@SuppressWarnings("OverlyBroadCatchBlock") final SdkException e) {
-            throw new IOException(e);
-        }
+        final S3RawGetResponse getResponse =
+            new S3RawGetClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).getObject(sanitizedPath);
+
+        final URI uri = UriComponentsBuilder
+            .fromUri(getConfiguration().getEndpoint())
+            .path("/")
+            .path(sanitizedPath)
+            .build()
+            .toUri();
+        return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, getResponse.contentType(),
+            getResponse.contentLength(), stripEtag(getResponse.eTag()), getResponse.metadata(),
+            getResponse.lastModified());
     }
 
     @Override
-    default void delete(final Collection<String> paths) {
+    default void delete(final Collection<String> paths) throws IOException {
         if (paths.isEmpty()) {
             return;
         }
-        final List<ObjectIdentifier> objectIdentifiers = paths
-            .stream()
-            .map(StorageProviderUtil::sanitizePath)
-            .map(path -> ObjectIdentifier.builder().key(path).build())
-            .toList();
-        final Delete delete = Delete.builder().objects(objectIdentifiers).quiet(true).build();
-        final DeleteObjectsRequest request =
-            DeleteObjectsRequest.builder().bucket(getConfiguration().getBucket()).delete(delete).build();
+        final List<String> sanitizedPaths = paths.stream().map(StorageProviderUtil::sanitizePath).toList();
 
-        getS3Client().deleteObjects(request);
+        new S3RawDeleteClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).deleteObjects(
+            sanitizedPaths);
     }
 
     @Override
-    default void delete(final String path) {
+    default void delete(final String path) throws IOException {
         delete(List.of(path));
     }
 
     @Override
-    default void move(final String fromPath, final String toPath) {
+    default void move(final String fromPath, final String toPath) throws IOException {
         copy(fromPath, toPath);
         delete(fromPath);
     }
 
     @Override
-    default void copy(final String fromPath, final String toPath) {
-        final CopyObjectRequest request = CopyObjectRequest
-            .builder()
-            .destinationBucket(getConfiguration().getBucket())
-            .sourceBucket(getConfiguration().getBucket())
-            .sourceKey(StorageProviderUtil.sanitizePath(fromPath))
-            .destinationKey(StorageProviderUtil.sanitizePath(toPath))
-            .acl(ObjectCannedACL.PUBLIC_READ)
-            .build();
-
-        getS3Client().copyObject(request);
+    default void copy(final String fromPath, final String toPath) throws IOException {
+        final String sanitizedFromPath = StorageProviderUtil.sanitizePath(fromPath);
+        final String sanitizedToPath = StorageProviderUtil.sanitizePath(toPath);
+        new S3RawCopyClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).copyObject(sanitizedFromPath,
+            sanitizedToPath);
     }
 
     private static String stripEtag(final String eTag) {

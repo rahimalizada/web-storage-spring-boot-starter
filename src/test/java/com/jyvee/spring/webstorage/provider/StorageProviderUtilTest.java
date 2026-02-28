@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,10 +97,9 @@ class StorageProviderUtilTest {
         Assertions.assertTrue(StorageProviderUtil.getMissingDirectories(tempDirectory).isEmpty());
         Assertions.assertTrue(StorageProviderUtil
             .getMissingDirectories(directory)
-            .containsAll(List.of(tempDirectory.resolve("a"),
-                tempDirectory.resolve("a/b"),
-                tempDirectory.resolve("a/b/c"),
-                tempDirectory.resolve("a/b/c/d"))));
+            .containsAll(
+                List.of(tempDirectory.resolve("a"), tempDirectory.resolve("a/b"), tempDirectory.resolve("a/b/c"),
+                    tempDirectory.resolve("a/b/c/d"))));
     }
 
     @Test
@@ -113,10 +112,9 @@ class StorageProviderUtilTest {
         final Path directory = tempDirectory.resolve("a/b/c/d");
         StorageProviderUtil.createMissingDirectories(directory, principalName, principalName, PERMISSION_STR);
 
-        final List<Path> createdDirectories = List.of(tempDirectory.resolve("a"),
-            tempDirectory.resolve("a/b"),
-            tempDirectory.resolve("a/b/c"),
-            tempDirectory.resolve("a/b/c/d"));
+        final List<Path> createdDirectories =
+            List.of(tempDirectory.resolve("a"), tempDirectory.resolve("a/b"), tempDirectory.resolve("a/b/c"),
+                tempDirectory.resolve("a/b/c/d"));
 
         Assertions.assertTrue(Files.exists(tempDirectory));
         for (final Path createdDirectory : createdDirectories) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,54 +51,22 @@ class S3StorageConfigurationPropertiesTest {
         Assertions.assertThrows(NullPointerException.class, () -> new S3StorageConfigurationPropertiesImpl(null));
         Assertions.assertThrows(IllegalArgumentException.class,
             () -> new S3StorageConfigurationPropertiesImpl(buildUri(null, null, null, null, null)));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri(null,
-                "BUCKET",
-                "KEY",
-                "SECRET",
-                "https://site.url")));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri(" ",
-                "BUCKET",
-                "KEY",
-                "SECRET",
-                "https://site.url")));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri("REGION",
-                null,
-                "KEY",
-                "SECRET",
-                "https://site.url")));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri("REGION",
-                " ",
-                "KEY",
-                "SECRET",
-                "https://site.url")));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri("REGION",
-                "BUCKET",
-                null,
-                "SECRET",
-                "https://site.url")));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri("REGION",
-                "BUCKET",
-                " ",
-                "SECRET",
-                "https://site.url")));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri("REGION",
-                "BUCKET",
-                "KEY",
-                null,
-                "https://site.url")));
-        Assertions.assertThrows(IllegalArgumentException.class,
-            () -> new S3StorageConfigurationPropertiesImpl(buildUri("REGION",
-                "BUCKET",
-                "KEY",
-                " ",
-                "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri(null, "BUCKET", "KEY", "SECRET", "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri(" ", "BUCKET", "KEY", "SECRET", "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri("REGION", null, "KEY", "SECRET", "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri("REGION", " ", "KEY", "SECRET", "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri("REGION", "BUCKET", null, "SECRET", "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri("REGION", "BUCKET", " ", "SECRET", "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri("REGION", "BUCKET", "KEY", null, "https://site.url")));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> new S3StorageConfigurationPropertiesImpl(
+            buildUri("REGION", "BUCKET", "KEY", " ", "https://site.url")));
         Assertions.assertThrows(IllegalArgumentException.class,
             () -> new S3StorageConfigurationPropertiesImpl(buildUri("REGION", "BUCKET", "KEY", "SECRET", null)));
         Assertions.assertThrows(IllegalArgumentException.class,

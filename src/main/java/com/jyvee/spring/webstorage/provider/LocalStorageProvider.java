@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,6 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
     }
 
     @Override
-    @SuppressWarnings("SpellCheckingInspection")
     default T save(final String path, final String contentType, final byte[] payload,
                    final Map<String, String> metadata) throws IOException {
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
@@ -76,14 +75,8 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
         }
         final URI uri =
             UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).pathSegment(sanitizedPath).build().toUri();
-        return newInstance(uri,
-            getConfiguration().getStorageId(),
-            sanitizedPath,
-            contentType,
-            payload.length,
-            md5,
-            metadata,
-            Files.getLastModifiedTime(filePath).toInstant());
+        return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, contentType, payload.length, md5,
+            metadata, Files.getLastModifiedTime(filePath).toInstant());
     }
 
     @Override
@@ -105,14 +98,8 @@ public interface LocalStorageProvider<T> extends StorageProvider<T, LocalStorage
 
         final URI uri =
             UriComponentsBuilder.fromUri(getConfiguration().getEndpoint()).pathSegment(sanitizedPath).build().toUri();
-        return newInstance(uri,
-            getConfiguration().getStorageId(),
-            sanitizedPath,
-            contentType,
-            Files.size(filePath),
-            md5,
-            metadata,
-            Files.getLastModifiedTime(filePath).toInstant());
+        return newInstance(uri, getConfiguration().getStorageId(), sanitizedPath, contentType, Files.size(filePath),
+            md5, metadata, Files.getLastModifiedTime(filePath).toInstant());
     }
 
     @Override

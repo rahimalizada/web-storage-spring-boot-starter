@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,8 +60,7 @@ final class StorageProviderUtil {
     }
 
     static List<Path> listFiles(final Path path) throws IOException {
-        try (final Stream<Path> stream = Files.find(path,
-            Integer.MAX_VALUE,
+        try (final Stream<Path> stream = Files.find(path, Integer.MAX_VALUE,
             (filePath, fileAttr) -> fileAttr.isRegularFile())) {
             return stream.toList();
         } catch (final NoSuchFileException e) {

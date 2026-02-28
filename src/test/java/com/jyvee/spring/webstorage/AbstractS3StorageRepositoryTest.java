@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,8 @@ class AbstractS3StorageRepositoryTest extends StorageRepositoryTest {
         S3_MOCK.start();
         log.info("S3Mock test container uri: {}", S3_MOCK.getHttpEndpoint());
         registry.add("web-storage.s3.uri",
-            () -> S3_MOCK.getHttpEndpoint()
-                  + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url/base");
+            () -> S3_MOCK.getHttpEndpoint() + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint"
+                  + "=https://site.url/base");
     }
 
     AbstractS3StorageRepositoryTest(@Autowired final S3StorageRepository service) {

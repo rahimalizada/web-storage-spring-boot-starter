@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,8 @@ abstract class StorageRepositoryTest {
     @Test
     void saveByFileType_validArgs_Ok() throws IOException {
         final Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-        final WebFile saved = this.repository.save(WebFileType.VALID_TEXT,
-            "temp-path/test.txt",
-            "text/plain",
-            "Test".getBytes(StandardCharsets.UTF_8),
-            Map.of("key", "value"));
+        final WebFile saved = this.repository.save(WebFileType.VALID_TEXT, "temp-path/test.txt", "text/plain",
+            "Test".getBytes(StandardCharsets.UTF_8), Map.of("key", "value"));
         Assertions.assertEquals(this.repository.getConfiguration().getEndpoint()
                                 + "/test/files/temp_path/0/c/0cbc6611f5540bd0809a388dc95a615b/test.txt",
             saved.getUri().toString());
@@ -75,13 +72,10 @@ abstract class StorageRepositoryTest {
         Assertions.assertThrows(IllegalArgumentException.class,
             () -> this.repository.save(WebFileType.VALID_TEXT, List.of()));
 
-        final List<MockMultipartFile> multipartFiles = List.of(new MockMultipartFile("unused",
-                "temp-path/test.txt",
-                "text/plain",
+        final List<MockMultipartFile> multipartFiles = List.of(
+            new MockMultipartFile("unused", "temp-path/test.txt", "text/plain",
                 "Test".getBytes(StandardCharsets.UTF_8)),
-            new MockMultipartFile("unused",
-                "temp-path/test.txt",
-                "text/plain",
+            new MockMultipartFile("unused", "temp-path/test.txt", "text/plain",
                 "Test".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals(1,

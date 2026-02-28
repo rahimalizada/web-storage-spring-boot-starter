@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,54 +33,43 @@ class DefaultStoragePathProviderTest {
     @Test
     void getStoragePath_validArgs_validPath() {
 
-        Assertions.assertEquals(RESULT_PATH,
-            this.provider.getStoragePath(Path.of(""),
-                Path.of("filename.ext"),
+        Assertions.assertEquals(RESULT_PATH, this.provider.getStoragePath(Path.of(""), Path.of("filename.ext"),
+            "payload".getBytes(StandardCharsets.UTF_8)));
+
+        Assertions.assertEquals("files" + RESULT_PATH,
+            this.provider.getStoragePath(Path.of("files"), Path.of("filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("files"),
-                Path.of("filename.ext"),
+            this.provider.getStoragePath(Path.of("files/"), Path.of("filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("files/"),
-                Path.of("filename.ext"),
+            this.provider.getStoragePath(Path.of("/files"), Path.of("filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("/files"),
-                Path.of("filename.ext"),
+            this.provider.getStoragePath(Path.of("files/"), Path.of("/filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("files/"),
-                Path.of("/filename.ext"),
-                "payload".getBytes(StandardCharsets.UTF_8)));
-
-        Assertions.assertEquals("files" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("/files/"),
-                Path.of("/filename.ext"),
+            this.provider.getStoragePath(Path.of("/files/"), Path.of("/filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files/sub_path" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("files/"),
-                Path.of("sub_path/filename.ext"),
+            this.provider.getStoragePath(Path.of("files/"), Path.of("sub_path/filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files/sub_path" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("files/"),
-                Path.of("/sub_path/filename.ext"),
+            this.provider.getStoragePath(Path.of("files/"), Path.of("/sub_path/filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files/sub_path" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("/files/"),
-                Path.of("/sub_path/filename.ext"),
+            this.provider.getStoragePath(Path.of("/files/"), Path.of("/sub_path/filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
         Assertions.assertEquals("files/sub_path" + RESULT_PATH,
-            this.provider.getStoragePath(Path.of("/files"),
-                Path.of("/sub_path/filename.ext"),
+            this.provider.getStoragePath(Path.of("/files"), Path.of("/sub_path/filename.ext"),
                 "payload".getBytes(StandardCharsets.UTF_8)));
 
     }

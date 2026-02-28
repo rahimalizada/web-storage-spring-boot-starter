@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,9 @@ class S3StorageProviderTest extends AbstractStorageProviderTest {
 
     @BeforeAll
     void beforeAll() {
-        final S3StorageConfigurationProperties configurationProperties =
-            new S3StorageConfigurationPropertiesImpl(URI.create(
-                S3_MOCK.getHttpEndpoint() + "/?region=region&bucket=bucket&key=key&secret"
-                + "=secret&endpoint=https://site.url/base"));
+        final S3StorageConfigurationProperties configurationProperties = new S3StorageConfigurationPropertiesImpl(
+            URI.create(S3_MOCK.getHttpEndpoint() + "/?region=region&bucket=bucket&key=key&secret"
+                       + "=secret&endpoint=https://site.url/base"));
         setProvider(new S3StorageProvider(configurationProperties));
 
     }
