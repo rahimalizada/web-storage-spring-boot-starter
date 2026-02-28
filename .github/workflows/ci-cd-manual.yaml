@@ -5,8 +5,10 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v6
+
       - name: Set JDK/Maven
         uses: actions/setup-java@v5
         with:
@@ -18,8 +20,18 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
+
+      - name: Get version number from tag
+        run: |
+          TAG=${{ github.ref_name }}
+          echo "VERSION=${TAG#v}" >> $GITHUB_ENV
+
+      - name: Update version in pom.xml
+        run: mvn versions:set -DnewVersion=${{ env.VERSION }} -DgenerateBackupPoms=false --batch-mode --no-transfer-progress
+
       - name: Build with Maven
         run: mvn clean package -DskipTests -V -B -ntp
+
       - name: Publish package
         run: mvn deploy -V -B -ntp -DskipTests -Dlicense.skip=true
         env:
