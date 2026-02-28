@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,24 +17,20 @@
 package com.jyvee.spring.test.webstorage;
 
 import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationProperties;
-import com.jyvee.spring.webstorage.provider.S3ClientProvider;
 import lombok.Getter;
-import software.amazon.awssdk.services.s3.S3Client;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 
+@SuppressWarnings("ClassCanBeRecord")
 @Getter
 public class S3StorageProvider implements com.jyvee.spring.webstorage.provider.S3StorageProvider<WebFile> {
 
     private final S3StorageConfigurationProperties configuration;
 
-    private final S3Client s3Client;
-
     public S3StorageProvider(final S3StorageConfigurationProperties configuration) {
         this.configuration = configuration;
-        this.s3Client = new S3ClientProvider().getS3Client(configuration);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,29 +54,25 @@ class StorageImageValidatorTest {
 
     @Test
     void validate_InvalidArgs_Exception() {
-        Assertions.assertEquals("Image width is too small",
-            Assertions
-                .assertThrows(IllegalArgumentException.class,
-                    () -> this.validator.validate(WebFileType.INVALID_MIN_WIDTH, "image/jpeg", payload))
-                .getMessage());
+        Assertions.assertEquals("Image width is too small", Assertions
+            .assertThrows(IllegalArgumentException.class,
+                () -> this.validator.validate(WebFileType.INVALID_MIN_WIDTH, "image/jpeg", payload))
+            .getMessage());
 
-        Assertions.assertEquals("Image height is too small",
-            Assertions
-                .assertThrows(IllegalArgumentException.class,
-                    () -> this.validator.validate(WebFileType.INVALID_MIN_HEIGHT, "image/jpeg", payload))
-                .getMessage());
+        Assertions.assertEquals("Image height is too small", Assertions
+            .assertThrows(IllegalArgumentException.class,
+                () -> this.validator.validate(WebFileType.INVALID_MIN_HEIGHT, "image/jpeg", payload))
+            .getMessage());
 
-        Assertions.assertEquals("Image width is too big",
-            Assertions
-                .assertThrows(IllegalArgumentException.class,
-                    () -> this.validator.validate(WebFileType.INVALID_MAX_WIDTH, "image/jpeg", payload))
-                .getMessage());
+        Assertions.assertEquals("Image width is too big", Assertions
+            .assertThrows(IllegalArgumentException.class,
+                () -> this.validator.validate(WebFileType.INVALID_MAX_WIDTH, "image/jpeg", payload))
+            .getMessage());
 
-        Assertions.assertEquals("Image height is too big",
-            Assertions
-                .assertThrows(IllegalArgumentException.class,
-                    () -> this.validator.validate(WebFileType.INVALID_MAX_HEIGHT, "image/jpeg", payload))
-                .getMessage());
+        Assertions.assertEquals("Image height is too big", Assertions
+            .assertThrows(IllegalArgumentException.class,
+                () -> this.validator.validate(WebFileType.INVALID_MAX_HEIGHT, "image/jpeg", payload))
+            .getMessage());
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class StorageContentTypeValidator implements StorageValidator {
             .substring(0, contentType.indexOf(';'))
             .strip()
             .toLowerCase(Locale.ENGLISH) : contentType.strip().toLowerCase(Locale.ENGLISH);
-        
+
         if (validatorConfiguration.getContentTypes() != null && !validatorConfiguration
             .getContentTypes()
             .contains(sanitizedContentType)) {

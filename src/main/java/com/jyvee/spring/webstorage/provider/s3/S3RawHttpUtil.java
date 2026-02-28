@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2026 Rahim Alizada
+ * Copyright (c) 2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,21 @@
  * limitations under the License.
  */
 
-package com.jyvee.spring.autoconfigure.webstorage;
+package com.jyvee.spring.webstorage.provider.s3;
 
-import com.jyvee.spring.webstorage.WebStorageConfiguration;
-import com.jyvee.spring.webstorage.validator.StorageValidatorConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.Import;
+import java.net.http.HttpRequest;
+import java.util.Map;
 
-@AutoConfiguration
-@Import({WebStorageConfiguration.class, StorageValidatorConfiguration.class})
-public class WebStorageAutoConfiguration {}
+final class S3RawHttpUtil {
+
+    private S3RawHttpUtil() {}
+
+    static void applyHeadersExceptHost(final HttpRequest.Builder builder, final Map<String, String> headers) {
+        for (final Map.Entry<String, String> header : headers.entrySet()) {
+            if (!"host".equals(header.getKey())) {
+                builder.header(header.getKey(), header.getValue());
+            }
+        }
+    }
+
+}

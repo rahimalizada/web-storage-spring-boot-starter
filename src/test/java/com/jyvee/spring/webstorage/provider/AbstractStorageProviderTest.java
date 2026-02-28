@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,9 +81,8 @@ abstract class AbstractStorageProviderTest {
         this.provider.copy("temp_path/test2.txt", "temp_path/test.txt");
         Assertions.assertNotNull(this.provider.load("temp_path/test.txt"));
 
-        Assertions.assertTrue(this.provider
-            .list("temp_path")
-            .containsAll(List.of("temp_path/test.txt", "temp_path/test2.txt")));
+        Assertions.assertTrue(
+            this.provider.list("temp_path").containsAll(List.of("temp_path/test.txt", "temp_path/test2.txt")));
         Assertions.assertEquals(2, this.provider.list("temp_path").size());
         Assertions.assertEquals(2, this.provider.list("temp_path").size());
         Assertions.assertEquals(0, this.provider.list("invalid-path").size());
@@ -120,6 +119,18 @@ abstract class AbstractStorageProviderTest {
         Assertions.assertTrue(this.provider.list("temp_path").contains("temp_path/test.txt"));
         this.provider.delete("invalid");
         Assertions.assertTrue(this.provider.list("temp_path").contains("temp_path/test.txt"));
+    }
+
+    @Test
+    void delete_multiplePaths_deleteAllFiles() throws IOException {
+        saveTestFile("temp-path/collection/a.txt");
+        saveTestFile("temp-path/collection/b.txt");
+
+        Assertions.assertEquals(2, this.provider.list("temp_path/collection").size());
+
+        this.provider.delete(List.of("temp-path/collection/a.txt", "temp-path/collection/b.txt"));
+
+        Assertions.assertTrue(this.provider.list("temp_path/collection").isEmpty());
     }
 
     private WebFile saveTestFile(final String path) throws IOException {

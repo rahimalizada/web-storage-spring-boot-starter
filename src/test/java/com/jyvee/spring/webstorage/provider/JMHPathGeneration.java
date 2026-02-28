@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,10 +74,8 @@ public class JMHPathGeneration {
     public static void uriComponentsBuilder(final BenchmarkState benchmarkState, final Blackhole blackhole) {
         blackhole.consume(UriComponentsBuilder
             .fromPath(benchmarkState.basePath)
-            .pathSegment(benchmarkState.checksum.substring(0, 1),
-                benchmarkState.checksum.substring(1, 2),
-                benchmarkState.checksum,
-                benchmarkState.filename)
+            .pathSegment(benchmarkState.checksum.substring(0, 1), benchmarkState.checksum.substring(1, 2),
+                benchmarkState.checksum, benchmarkState.filename)
             .build()
             .toUriString());
     }

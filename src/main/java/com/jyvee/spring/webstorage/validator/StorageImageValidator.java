@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,11 +49,8 @@ class StorageImageValidator implements StorageValidator {
             return Map.of();
         }
         try {
-            return checkImage(contentType,
-                payload,
-                validatorConfiguration.getMinWidth(),
-                validatorConfiguration.getMinHeight(),
-                validatorConfiguration.getMaxWidth(),
+            return checkImage(contentType, payload, validatorConfiguration.getMinWidth(),
+                validatorConfiguration.getMinHeight(), validatorConfiguration.getMaxWidth(),
                 validatorConfiguration.getMaxHeight());
         } catch (final IOException e) {
             throw new IllegalArgumentException("Invalid image file", e);
@@ -80,9 +77,7 @@ class StorageImageValidator implements StorageValidator {
             throw new IllegalArgumentException("Image height is too big");
         }
 
-        return Map.of("width",
-            String.valueOf(bufferedImage.getWidth()),
-            "height",
+        return Map.of("width", String.valueOf(bufferedImage.getWidth()), "height",
             String.valueOf(bufferedImage.getHeight()));
 
         // return Map.of();

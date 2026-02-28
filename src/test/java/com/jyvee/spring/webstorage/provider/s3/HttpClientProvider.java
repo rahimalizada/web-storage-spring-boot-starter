@@ -14,13 +14,29 @@
  * limitations under the License.
  */
 
-package com.jyvee.spring.autoconfigure.webstorage;
+package com.jyvee.spring.webstorage.provider.s3;
 
-import com.jyvee.spring.webstorage.WebStorageConfiguration;
-import com.jyvee.spring.webstorage.validator.StorageValidatorConfiguration;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.context.annotation.Import;
+import lombok.Getter;
 
-@AutoConfiguration
-@Import({WebStorageConfiguration.class, StorageValidatorConfiguration.class})
-public class WebStorageAutoConfiguration {}
+import java.net.http.HttpClient;
+
+final class HttpClientProvider {
+
+    @Getter
+    private final HttpClient httpClient;
+
+    private HttpClientProvider() {
+        this.httpClient = HttpClient.newHttpClient();
+    }
+
+    private enum Singleton {
+        INSTANCE;
+
+        private final HttpClientProvider instance = new HttpClientProvider();
+    }
+
+    static HttpClientProvider get() {
+        return Singleton.INSTANCE.instance;
+    }
+
+}

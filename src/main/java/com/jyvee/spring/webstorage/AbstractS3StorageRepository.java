@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,12 @@ import com.jyvee.spring.webstorage.validator.StorageValidator;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import software.amazon.awssdk.services.s3.S3Client;
 
 import java.util.List;
 
 @Getter
 public abstract class AbstractS3StorageRepository<T>
     implements S3StorageProvider<T>, StorageRepository<T, S3StorageConfigurationProperties> {
-
-    @Lazy
-    @Autowired
-    private S3Client s3Client;
 
     @Autowired
     private S3StorageConfigurationProperties configuration;
