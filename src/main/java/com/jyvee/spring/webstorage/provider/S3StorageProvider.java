@@ -17,13 +17,13 @@
 package com.jyvee.spring.webstorage.provider;
 
 import com.jyvee.spring.webstorage.configuration.S3StorageConfigurationProperties;
-import com.jyvee.spring.webstorage.provider.s3.S3RawCopyClient;
-import com.jyvee.spring.webstorage.provider.s3.S3RawDeleteClient;
-import com.jyvee.spring.webstorage.provider.s3.S3RawGetClient;
-import com.jyvee.spring.webstorage.provider.s3.S3RawGetResponse;
-import com.jyvee.spring.webstorage.provider.s3.S3RawListClient;
-import com.jyvee.spring.webstorage.provider.s3.S3RawPutClient;
-import com.jyvee.spring.webstorage.provider.s3.S3RawPutResponse;
+import com.jyvee.spring.webstorage.provider.s3.S3CopyClient;
+import com.jyvee.spring.webstorage.provider.s3.S3DeleteClient;
+import com.jyvee.spring.webstorage.provider.s3.S3GetClient;
+import com.jyvee.spring.webstorage.provider.s3.S3GetResponse;
+import com.jyvee.spring.webstorage.provider.s3.S3ListClient;
+import com.jyvee.spring.webstorage.provider.s3.S3PutClient;
+import com.jyvee.spring.webstorage.provider.s3.S3PutResponse;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
@@ -51,8 +51,8 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
                 entry -> URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8), (_, second) -> second,
                 LinkedHashMap::new));
 
-        final S3RawPutResponse putResponse =
-            new S3RawPutClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).putObject(sanitizedPath,
+        final S3PutResponse putResponse =
+            new S3PutClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).put(sanitizedPath,
                 contentType, payload, sanitizedMetadata);
 
         final URI uri = UriComponentsBuilder
@@ -69,14 +69,14 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
     @Override
     default List<String> list(final String path) throws IOException {
         final String prefix = StorageProviderUtil.sanitizePath(path);
-        return new S3RawListClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).listObjects(prefix);
+        return new S3ListClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).list(prefix);
     }
 
     @Override
     default T load(final String path) throws IOException {
         final String sanitizedPath = StorageProviderUtil.sanitizePath(path);
-        final S3RawGetResponse getResponse =
-            new S3RawGetClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).getObject(sanitizedPath);
+        final S3GetResponse getResponse =
+            new S3GetClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).get(sanitizedPath);
 
         final URI uri = UriComponentsBuilder
             .fromUri(getConfiguration().getEndpoint())
@@ -96,8 +96,7 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
         }
         final List<String> sanitizedPaths = paths.stream().map(StorageProviderUtil::sanitizePath).toList();
 
-        new S3RawDeleteClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).deleteObjects(
-            sanitizedPaths);
+        new S3DeleteClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).delete(sanitizedPaths);
     }
 
     @Override
@@ -115,7 +114,7 @@ public interface S3StorageProvider<T> extends StorageProvider<T, S3StorageConfig
     default void copy(final String fromPath, final String toPath) throws IOException {
         final String sanitizedFromPath = StorageProviderUtil.sanitizePath(fromPath);
         final String sanitizedToPath = StorageProviderUtil.sanitizePath(toPath);
-        new S3RawCopyClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).copyObject(sanitizedFromPath,
+        new S3CopyClient(HttpClientProvider.get().getHttpClient(), getConfiguration()).copy(sanitizedFromPath,
             sanitizedToPath);
     }
 

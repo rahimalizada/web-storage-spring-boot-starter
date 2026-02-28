@@ -34,85 +34,84 @@ import java.util.Map;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class S3RawDeleteClientTest {
+class S3DeleteClientTest {
 
     @Container
     private static final S3MockContainer S3_MOCK = new S3MockContainer("latest").withInitialBuckets("bucket");
 
-    private S3RawDeleteClient deleteClient;
+    private S3DeleteClient deleteClient;
 
-    private S3RawPutClient putClient;
+    private S3PutClient putClient;
 
-    private S3RawListClient listClient;
+    private S3ListClient listClient;
 
     @BeforeAll
     void beforeAll() {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url"));
-        this.deleteClient = new S3RawDeleteClient(HttpClientProvider.get().getHttpClient(), props);
-        this.putClient = new S3RawPutClient(HttpClientProvider.get().getHttpClient(), props);
-        this.listClient = new S3RawListClient(HttpClientProvider.get().getHttpClient(), props);
+        this.deleteClient = new S3DeleteClient(HttpClientProvider.get().getHttpClient(), props);
+        this.putClient = new S3PutClient(HttpClientProvider.get().getHttpClient(), props);
+        this.listClient = new S3ListClient(HttpClientProvider.get().getHttpClient(), props);
     }
 
     @Test
-    void deleteObjects_existingSingleKey_removesObject() throws IOException {
+    void delete_existingSingleKey_removesObject() throws IOException {
         final String key = "delete/single/file.txt";
-        this.putClient.putObject(key, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of());
-        Assertions.assertTrue(this.listClient.listObjects("delete/single/").contains(key));
+        this.putClient.put(key, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of());
+        Assertions.assertTrue(this.listClient.list("delete/single/").contains(key));
 
-        this.deleteClient.deleteObjects(List.of(key));
+        this.deleteClient.delete(List.of(key));
 
-        Assertions.assertFalse(this.listClient.listObjects("delete/single/").contains(key));
+        Assertions.assertFalse(this.listClient.list("delete/single/").contains(key));
     }
 
     @Test
-    void deleteObjects_multipleExistingKeys_removesAll() throws IOException {
+    void delete_multipleExistingKeys_removesAll() throws IOException {
         final List<String> keys = List.of("delete/multi/a.txt", "delete/multi/b.txt", "delete/multi/c/file.txt");
         for (final String key : keys) {
-            this.putClient.putObject(key, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of());
+            this.putClient.put(key, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of());
         }
 
-        this.deleteClient.deleteObjects(keys);
+        this.deleteClient.delete(keys);
 
-        Assertions.assertTrue(this.listClient.listObjects("delete/multi/").isEmpty());
+        Assertions.assertTrue(this.listClient.list("delete/multi/").isEmpty());
     }
 
     @Test
-    void deleteObjects_mixedExistingAndMissingKeys_deletesExistingAndSucceeds() throws IOException {
+    void delete_mixedExistingAndMissingKeys_deletesExistingAndSucceeds() throws IOException {
         final String existing = "delete/mixed/existing.txt";
-        this.putClient.putObject(existing, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of());
+        this.putClient.put(existing, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of());
 
-        Assertions.assertDoesNotThrow(
-            () -> this.deleteClient.deleteObjects(List.of(existing, "delete/mixed/missing.txt")));
-        Assertions.assertTrue(this.listClient.listObjects("delete/mixed/").isEmpty());
+        Assertions.assertDoesNotThrow(() -> this.deleteClient.delete(List.of(existing, "delete/mixed/missing.txt")));
+        Assertions.assertTrue(this.listClient.list("delete/mixed/").isEmpty());
     }
 
     @Test
-    void deleteObjects_nonExistentKeysOnly_succeeds() {
+    void delete_nonExistentKeysOnly_succeeds() {
         Assertions.assertDoesNotThrow(
-            () -> this.deleteClient.deleteObjects(List.of("delete/missing/a.txt", "delete/missing/b.txt")));
+            () -> this.deleteClient.delete(List.of("delete/missing/a.txt", "delete/missing/b.txt")));
     }
 
     @Test
-    void deleteObjects_nestedPathsAndDots_removesObjects() throws IOException {
+    void deleteObjects_nestedPathsAndDots_removes() throws IOException {
         final List<String> keys = List.of("delete/nested/a/b/c.json", "delete/nested/version-1.2.3/file.bin");
         for (final String key : keys) {
-            this.putClient.putObject(key, "application/octet-stream", "x".getBytes(StandardCharsets.UTF_8), Map.of());
+            this.putClient.put(key, "application/octet-stream", "x".getBytes(StandardCharsets.UTF_8), Map.of());
         }
 
-        this.deleteClient.deleteObjects(keys);
+        this.deleteClient.delete(keys);
 
-        Assertions.assertTrue(this.listClient.listObjects("delete/nested/").isEmpty());
+        Assertions.assertTrue(this.listClient.list("delete/nested/").isEmpty());
     }
 
     @Test
-    void deleteObjects_nonExistentBucket_throwsIOException() {
+    void delete_nonExistentBucket_throwsIOException() {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=nonexistent&key=key&secret=secret&endpoint=https://site.url"));
-        final S3RawDeleteClient errorClient = new S3RawDeleteClient(HttpClientProvider.get().getHttpClient(), props);
-        Assertions.assertThrows(IOException.class, () -> errorClient.deleteObjects(List.of("key.txt")));
+        final S3DeleteClient errorClient = new S3DeleteClient(HttpClientProvider.get().getHttpClient(), props);
+        Assertions.assertThrows(IOException.class, () -> errorClient.delete(List.of("key.txt")));
     }
 
 }

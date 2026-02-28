@@ -34,33 +34,33 @@ import java.util.Map;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class S3RawListClientTest {
+class S3ListClientTest {
 
     @Container
     private static final S3MockContainer S3_MOCK = new S3MockContainer("latest").withInitialBuckets("bucket");
 
-    private S3RawListClient client;
+    private S3ListClient client;
 
     @BeforeAll
     void beforeAll() throws IOException {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url"));
-        this.client = new S3RawListClient(HttpClientProvider.get().getHttpClient(), props);
+        this.client = new S3ListClient(HttpClientProvider.get().getHttpClient(), props);
 
         // Pre-populate the bucket using S3RawPutClient
-        final S3RawPutClient putClient = new S3RawPutClient(HttpClientProvider.get().getHttpClient(), props);
+        final S3PutClient putClient = new S3PutClient(HttpClientProvider.get().getHttpClient(), props);
         final byte[] content = "data".getBytes(StandardCharsets.UTF_8);
-        putClient.putObject("images/photo.jpg", "image/jpeg", content, Map.of());
-        putClient.putObject("images/icon.png", "image/png", content, Map.of());
-        putClient.putObject("documents/report.pdf", "application/pdf", content, Map.of());
-        putClient.putObject("documents/notes.txt", "text/plain", content, Map.of());
-        putClient.putObject("readme.txt", "text/plain", content, Map.of());
+        putClient.put("images/photo.jpg", "image/jpeg", content, Map.of());
+        putClient.put("images/icon.png", "image/png", content, Map.of());
+        putClient.put("documents/report.pdf", "application/pdf", content, Map.of());
+        putClient.put("documents/notes.txt", "text/plain", content, Map.of());
+        putClient.put("readme.txt", "text/plain", content, Map.of());
     }
 
     @Test
-    void listObjects_emptyPrefix_returnsAllKeys() throws IOException {
-        final List<String> keys = this.client.listObjects("");
+    void list_emptyPrefix_returnsAllKeys() throws IOException {
+        final List<String> keys = this.client.list("");
         Assertions.assertEquals(5, keys.size());
         Assertions.assertTrue(keys.contains("images/photo.jpg"));
         Assertions.assertTrue(keys.contains("images/icon.png"));
@@ -70,46 +70,46 @@ class S3RawListClientTest {
     }
 
     @Test
-    void listObjects_imagesPrefix_returnsTwoImageKeys() throws IOException {
-        final List<String> keys = this.client.listObjects("images");
+    void list_imagesPrefix_returnsTwoImageKeys() throws IOException {
+        final List<String> keys = this.client.list("images");
         Assertions.assertEquals(2, keys.size());
         Assertions.assertTrue(keys.contains("images/photo.jpg"));
         Assertions.assertTrue(keys.contains("images/icon.png"));
     }
 
     @Test
-    void listObjects_documentsPrefix_returnsTwoDocumentKeys() throws IOException {
-        final List<String> keys = this.client.listObjects("documents");
+    void list_documentsPrefix_returnsTwoDocumentKeys() throws IOException {
+        final List<String> keys = this.client.list("documents");
         Assertions.assertEquals(2, keys.size());
         Assertions.assertTrue(keys.contains("documents/report.pdf"));
         Assertions.assertTrue(keys.contains("documents/notes.txt"));
     }
 
     @Test
-    void listObjects_readmePrefix_returnsSingleKey() throws IOException {
-        final List<String> keys = this.client.listObjects("readme");
+    void list_readmePrefix_returnsSingleKey() throws IOException {
+        final List<String> keys = this.client.list("readme");
         Assertions.assertEquals(1, keys.size());
         Assertions.assertEquals("readme.txt", keys.getFirst());
     }
 
     @Test
-    void listObjects_nonExistentPrefix_returnsEmptyNotTruncated() throws IOException {
-        final List<String> keys = this.client.listObjects("nonexistent/");
+    void list_nonExistentPrefix_returnsEmptyNotTruncated() throws IOException {
+        final List<String> keys = this.client.list("nonexistent/");
         Assertions.assertTrue(keys.isEmpty());
     }
 
     @Test
-    void listObjects_nonExistentBucket_throwsIOException() {
+    void list_nonExistentBucket_throwsIOException() {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=nonexistent&key=key&secret=secret&endpoint=https://site.url"));
-        final S3RawListClient errorClient = new S3RawListClient(HttpClientProvider.get().getHttpClient(), props);
-        Assertions.assertThrows(IOException.class, () -> errorClient.listObjects(""));
+        final S3ListClient errorClient = new S3ListClient(HttpClientProvider.get().getHttpClient(), props);
+        Assertions.assertThrows(IOException.class, () -> errorClient.list(""));
     }
 
     @Test
-    void listObjects_smallPageSize_returnsAllKeysAcrossPages() throws IOException {
-        final List<String> keys = this.client.listObjects("", 2);
+    void list_smallPageSize_returnsAllKeysAcrossPages() throws IOException {
+        final List<String> keys = this.client.list("", 2);
         Assertions.assertEquals(5, keys.size());
         Assertions.assertTrue(keys.contains("images/photo.jpg"));
         Assertions.assertTrue(keys.contains("images/icon.png"));
