@@ -19,7 +19,7 @@ jobs:
           gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
           gpg-passphrase: GPG_PASSPHRASE
       - name: Build with Maven
-        run: mvn clean package -V -B -ntp
+        run: mvn clean package -DskipTests -V -B -ntp
       - name: Publish package
         run: mvn deploy -V -B -ntp -DskipTests -Dlicense.skip=true
         env:
