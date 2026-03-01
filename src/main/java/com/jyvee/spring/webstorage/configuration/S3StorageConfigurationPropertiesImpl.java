@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023-2025 Rahim Alizada
+ * Copyright (c) 2023-2026 Rahim Alizada
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.jyvee.spring.webstorage.configuration;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Getter
+@ToString
 @Validated
 @ConfigurationProperties(prefix = "web-storage.s3")
 @ConditionalOnProperty(prefix = "web-storage.s3", name = "uri")

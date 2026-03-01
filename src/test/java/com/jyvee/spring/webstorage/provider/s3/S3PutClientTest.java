@@ -38,19 +38,19 @@ import java.util.stream.Stream;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class S3RawPutClientTest {
+class S3PutClientTest {
 
     @Container
     private static final S3MockContainer S3_MOCK = new S3MockContainer("latest").withInitialBuckets("bucket");
 
-    private S3RawPutClient client;
+    private S3PutClient client;
 
     @BeforeAll
     void beforeAll() {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url"));
-        this.client = new S3RawPutClient(HttpClientProvider.get().getHttpClient(), props);
+        this.client = new S3PutClient(HttpClientProvider.get().getHttpClient(), props);
     }
 
     // --- Key path variations ---
@@ -58,9 +58,8 @@ class S3RawPutClientTest {
     @ParameterizedTest(name = "key={0}")
     @ValueSource(strings = {"file.txt", "nested/path/file.txt", "deep/a/b/c/object.json", "with_underscores.txt",
         "with.multiple.dots.txt", "single"})
-    void putObject_variousKeys_returnsValidEtag(final String key) throws IOException {
-        assertValidEtag(
-            this.client.putObject(key, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of()).eTag());
+    void put_variousKeys_returnsValidEtag(final String key) throws IOException {
+        assertValidEtag(this.client.put(key, "text/plain", "data".getBytes(StandardCharsets.UTF_8), Map.of()).eTag());
     }
 
     // --- Content-type variations ---
@@ -68,9 +67,9 @@ class S3RawPutClientTest {
     @ParameterizedTest(name = "contentType={0}")
     @ValueSource(strings = {"text/plain", "application/json", "image/jpeg", "image/png", "application/octet-stream",
         "application/pdf"})
-    void putObject_variousContentTypes_returnsValidEtag(final String contentType) throws IOException {
+    void put_variousContentTypes_returnsValidEtag(final String contentType) throws IOException {
         assertValidEtag(this.client
-            .putObject("content-type/" + contentType.replace("/", "_"), contentType,
+            .put("content-type/" + contentType.replace("/", "_"), contentType,
                 "payload".getBytes(StandardCharsets.UTF_8), Map.of())
             .eTag());
     }
@@ -86,9 +85,8 @@ class S3RawPutClientTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("payloadArguments")
-    void putObject_variousPayloads_returnsValidEtag(final String label, final byte[] payload) throws IOException {
-        assertValidEtag(
-            this.client.putObject("payloads/" + label, "application/octet-stream", payload, Map.of()).eTag());
+    void put_variousPayloads_returnsValidEtag(final String label, final byte[] payload) throws IOException {
+        assertValidEtag(this.client.put("payloads/" + label, "application/octet-stream", payload, Map.of()).eTag());
     }
 
     // --- Metadata count variations ---
@@ -101,75 +99,60 @@ class S3RawPutClientTest {
 
     @ParameterizedTest(name = "{0}")
     @MethodSource("metadataArguments")
-    void putObject_variousMetadata_returnsValidEtag(final String label, final Map<String, String> metadata)
+    void put_variousMetadata_returnsValidEtag(final String label, final Map<String, String> metadata)
         throws IOException {
         assertValidEtag(this.client
-            .putObject("metadata/" + label, "text/plain", "data".getBytes(StandardCharsets.UTF_8), metadata)
+            .put("metadata/" + label, "text/plain", "data".getBytes(StandardCharsets.UTF_8), metadata)
             .eTag());
     }
 
     // --- ETag correctness ---
 
     @Test
-    void putObject_emptyPayload_returnsKnownMd5() throws IOException {
+    void put_emptyPayload_returnsKnownMd5() throws IOException {
         // MD5 of zero bytes is always d41d8cd98f00b204e9800998ecf8427e
-        final S3RawPutResponse response =
-            this.client.putObject("etag/empty.bin", "application/octet-stream", new byte[0], Map.of());
+        final S3PutResponse response =
+            this.client.put("etag/empty.bin", "application/octet-stream", new byte[0], Map.of());
         Assertions.assertEquals("d41d8cd98f00b204e9800998ecf8427e", stripQuotes(response.eTag()));
     }
 
     @Test
-    void putObject_knownContent_returnsKnownMd5() throws IOException {
+    void put_knownContent_returnsKnownMd5() throws IOException {
         // MD5("Test") = 0cbc6611f5540bd0809a388dc95a615b
         final byte[] payload = "Test".getBytes(StandardCharsets.UTF_8);
-        final S3RawPutResponse response = this.client.putObject("etag/known.txt", "text/plain", payload, Map.of());
+        final S3PutResponse response = this.client.put("etag/known.txt", "text/plain", payload, Map.of());
         Assertions.assertEquals("0cbc6611f5540bd0809a388dc95a615b", stripQuotes(response.eTag()));
     }
 
     @Test
-    void putObject_sameContent_sameEtag() throws IOException {
+    void put_sameContent_sameEtag() throws IOException {
         final byte[] payload = "deterministic-content".getBytes(StandardCharsets.UTF_8);
-        final S3RawPutResponse response1 = this.client.putObject("etag/same-a.txt", "text/plain", payload, Map.of());
-        final S3RawPutResponse response2 = this.client.putObject("etag/same-b.txt", "text/plain", payload, Map.of());
+        final S3PutResponse response1 = this.client.put("etag/same-a.txt", "text/plain", payload, Map.of());
+        final S3PutResponse response2 = this.client.put("etag/same-b.txt", "text/plain", payload, Map.of());
         Assertions.assertEquals(response1.eTag(), response2.eTag());
     }
 
     @Test
-    void putObject_differentContent_differentEtag() throws IOException {
-        final S3RawPutResponse response1 =
-            this.client.putObject("etag/diff-a.txt", "text/plain", "content-alpha".getBytes(StandardCharsets.UTF_8),
+    void put_differentContent_differentEtag() throws IOException {
+        final S3PutResponse response1 =
+            this.client.put("etag/diff-a.txt", "text/plain", "content-alpha".getBytes(StandardCharsets.UTF_8),
                 Map.of());
-        final S3RawPutResponse response2 =
-            this.client.putObject("etag/diff-b.txt", "text/plain", "content-beta".getBytes(StandardCharsets.UTF_8),
-                Map.of());
+        final S3PutResponse response2 =
+            this.client.put("etag/diff-b.txt", "text/plain", "content-beta".getBytes(StandardCharsets.UTF_8), Map.of());
         Assertions.assertNotEquals(response1.eTag(), response2.eTag());
     }
 
     // --- Conditional response fields ---
 
-    @Test
-    void putObject_noVersioningOrLifecycle_conditionalFieldsAreNull() throws IOException {
-        // S3Mock has no versioning, lifecycle rules, or checksum algorithms configured,
-        // so all conditional response fields must be absent (null).
-        final S3RawPutResponse response =
-            this.client.putObject("fields/standard.bin", "application/octet-stream", new byte[0], Map.of());
-        Assertions.assertNull(response.expiration());
-        Assertions.assertNull(response.versionId());
-        Assertions.assertNull(response.checksumCrc32());
-        Assertions.assertNull(response.checksumCrc32c());
-        Assertions.assertNull(response.checksumSha1());
-        Assertions.assertNull(response.checksumSha256());
-    }
-
     // --- Overwrite ---
 
     @Test
-    void putObject_overwriteExistingKey_etagReflectsNewContent() throws IOException {
+    void put_overwriteExistingKey_etagReflectsNewContent() throws IOException {
         final String key = "overwrite/file.txt";
-        final S3RawPutResponse response1 =
-            this.client.putObject(key, "text/plain", "original".getBytes(StandardCharsets.UTF_8), Map.of());
-        final S3RawPutResponse response2 =
-            this.client.putObject(key, "text/plain", "updated".getBytes(StandardCharsets.UTF_8), Map.of());
+        final S3PutResponse response1 =
+            this.client.put(key, "text/plain", "original".getBytes(StandardCharsets.UTF_8), Map.of());
+        final S3PutResponse response2 =
+            this.client.put(key, "text/plain", "updated".getBytes(StandardCharsets.UTF_8), Map.of());
         assertValidEtag(response2.eTag());
         Assertions.assertNotEquals(response1.eTag(), response2.eTag());
     }
@@ -177,13 +160,13 @@ class S3RawPutClientTest {
     // --- Error handling ---
 
     @Test
-    void putObject_nonExistentBucket_throwsIOException() {
+    void put_nonExistentBucket_throwsIOException() {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=nonexistent&key=key&secret=secret&endpoint=https://site.url"));
-        final S3RawPutClient errorClient = new S3RawPutClient(HttpClientProvider.get().getHttpClient(), props);
+        final S3PutClient errorClient = new S3PutClient(HttpClientProvider.get().getHttpClient(), props);
         Assertions.assertThrows(IOException.class,
-            () -> errorClient.putObject("key.txt", "text/plain", "x".getBytes(StandardCharsets.UTF_8), Map.of()));
+            () -> errorClient.put("key.txt", "text/plain", "x".getBytes(StandardCharsets.UTF_8), Map.of()));
     }
 
     // --- Helpers ---

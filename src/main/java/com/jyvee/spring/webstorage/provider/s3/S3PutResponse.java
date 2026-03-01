@@ -16,8 +16,4 @@
 
 package com.jyvee.spring.webstorage.provider.s3;
 
-import org.jspecify.annotations.Nullable;
-
-import java.util.List;
-
-record S3RawListResponse(List<String> keys, boolean isTruncated, @Nullable String nextContinuationToken) {}
+public record S3PutResponse(String eTag) {}

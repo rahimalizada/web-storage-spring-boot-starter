@@ -34,32 +34,31 @@ import java.util.Map;
 
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class S3RawGetClientTest {
+class S3GetClientTest {
 
     @Container
     private static final S3MockContainer S3_MOCK = new S3MockContainer("latest").withInitialBuckets("bucket");
 
-    private S3RawGetClient client;
+    private S3GetClient client;
 
     @BeforeAll
     void beforeAll() throws IOException {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=bucket&key=key&secret=secret&endpoint=https://site.url"));
-        this.client = new S3RawGetClient(HttpClientProvider.get().getHttpClient(), props);
+        this.client = new S3GetClient(HttpClientProvider.get().getHttpClient(), props);
 
-        final S3RawPutClient putClient = new S3RawPutClient(HttpClientProvider.get().getHttpClient(), props);
-        putClient.putObject("load/file.txt", "text/plain", "Test".getBytes(StandardCharsets.UTF_8), Map.of());
-        putClient.putObject("load/nested/file.json", "application/json", "{}".getBytes(StandardCharsets.UTF_8),
-            Map.of());
-        putClient.putObject("load/meta.bin", "application/octet-stream", "meta".getBytes(StandardCharsets.UTF_8),
+        final S3PutClient putClient = new S3PutClient(HttpClientProvider.get().getHttpClient(), props);
+        putClient.put("load/file.txt", "text/plain", "Test".getBytes(StandardCharsets.UTF_8), Map.of());
+        putClient.put("load/nested/file.json", "application/json", "{}".getBytes(StandardCharsets.UTF_8), Map.of());
+        putClient.put("load/meta.bin", "application/octet-stream", "meta".getBytes(StandardCharsets.UTF_8),
             Map.of("filename", "report.txt", "owner", "user1"));
-        putClient.putObject("load/empty.bin", "application/octet-stream", new byte[0], Map.of());
+        putClient.put("load/empty.bin", "application/octet-stream", new byte[0], Map.of());
     }
 
     @Test
-    void getObject_existingKey_returnsExpectedHeaders() throws IOException {
-        final S3RawGetResponse response = this.client.getObject("load/file.txt");
+    void get_existingKey_returnsExpectedHeaders() throws IOException {
+        final S3GetResponse response = this.client.get("load/file.txt");
         Assertions.assertEquals("text/plain", response.contentType());
         Assertions.assertEquals(4L, response.contentLength());
         Assertions.assertEquals("0cbc6611f5540bd0809a388dc95a615b", stripQuotes(response.eTag()));
@@ -69,39 +68,39 @@ class S3RawGetClientTest {
     }
 
     @Test
-    void getObject_nestedPath_returnsExpectedSizeAndContentType() throws IOException {
-        final S3RawGetResponse response = this.client.getObject("load/nested/file.json");
+    void get_nestedPath_returnsExpectedSizeAndContentType() throws IOException {
+        final S3GetResponse response = this.client.get("load/nested/file.json");
         Assertions.assertEquals("application/json", response.contentType());
         Assertions.assertEquals(2L, response.contentLength());
         Assertions.assertNotNull(response.lastModified());
     }
 
     @Test
-    void getObject_withCustomMetadata_returnsMetadataMap() throws IOException {
-        final S3RawGetResponse response = this.client.getObject("load/meta.bin");
+    void get_withCustomMetadata_returnsMetadataMap() throws IOException {
+        final S3GetResponse response = this.client.get("load/meta.bin");
         Assertions.assertEquals("report.txt", response.metadata().get("filename"));
         Assertions.assertEquals("user1", response.metadata().get("owner"));
     }
 
     @Test
-    void getObject_emptyPayload_returnsZeroContentLength() throws IOException {
-        final S3RawGetResponse response = this.client.getObject("load/empty.bin");
+    void get_emptyPayload_returnsZeroContentLength() throws IOException {
+        final S3GetResponse response = this.client.get("load/empty.bin");
         Assertions.assertEquals(0L, response.contentLength());
         Assertions.assertEquals("application/octet-stream", response.contentType());
     }
 
     @Test
-    void getObject_nonExistentKey_throwsIOException() {
-        Assertions.assertThrows(IOException.class, () -> this.client.getObject("load/missing.txt"));
+    void get_nonExistentKey_throwsIOException() {
+        Assertions.assertThrows(IOException.class, () -> this.client.get("load/missing.txt"));
     }
 
     @Test
-    void getObject_nonExistentBucket_throwsIOException() {
+    void get_nonExistentBucket_throwsIOException() {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
             + "/?region=region&bucket=nonexistent&key=key&secret=secret&endpoint=https://site.url"));
-        final S3RawGetClient errorClient = new S3RawGetClient(HttpClientProvider.get().getHttpClient(), props);
-        Assertions.assertThrows(IOException.class, () -> errorClient.getObject("key.txt"));
+        final S3GetClient errorClient = new S3GetClient(HttpClientProvider.get().getHttpClient(), props);
+        Assertions.assertThrows(IOException.class, () -> errorClient.get("key.txt"));
     }
 
     private static String stripQuotes(final String eTag) {
