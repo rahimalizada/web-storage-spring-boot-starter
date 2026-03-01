@@ -38,6 +38,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class S3PutClient {
 
+    private static final String OBJECT_ACL = "public-read";
+
     private final HttpClient httpClient;
 
     private final S3StorageConfigurationProperties configuration;
@@ -64,10 +66,10 @@ public class S3PutClient {
             "/" + S3ClientUtils.encodePath(this.configuration.getBucket()) + "/" + S3ClientUtils.encodePath(
                 S3ClientUtils.stripLeadingSlash(path));
         final String payloadHash = S3ClientUtils.sha256Hex(payload);
-        final String signedHeaders = "content-type;host;x-amz-content-sha256;x-amz-date";
+        final String signedHeaders = "content-type;host;x-amz-acl;x-amz-content-sha256;x-amz-date";
         final String canonicalHeaders =
-            "content-type:" + contentType + "\n" + "host:" + host + "\n" + "x-amz-content-sha256:" + payloadHash + "\n"
-            + "x-amz-date:" + amzDate + "\n";
+            "content-type:" + contentType + "\n" + "host:" + host + "\n" + "x-amz-acl:" + OBJECT_ACL + "\n"
+            + "x-amz-content-sha256:" + payloadHash + "\n" + "x-amz-date:" + amzDate + "\n";
         final String canonicalRequest =
             "PUT\n" + canonicalUri + "\n" + "\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + payloadHash;
 
@@ -79,6 +81,7 @@ public class S3PutClient {
             .newBuilder(URI.create(
                 S3ClientUtils.stripTrailingSlash(this.configuration.getServiceEndpoint().toString()) + canonicalUri))
             .header("Content-Type", contentType)
+            .header("x-amz-acl", OBJECT_ACL)
             .header("x-amz-content-sha256", payloadHash)
             .header("x-amz-date", amzDate)
             .header("Authorization", authorization);
