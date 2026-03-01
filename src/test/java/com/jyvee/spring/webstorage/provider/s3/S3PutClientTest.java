@@ -32,6 +32,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -142,6 +145,17 @@ class S3PutClientTest {
         Assertions.assertNotEquals(response1.eTag(), response2.eTag());
     }
 
+    @Test
+    void put_uploadedFile_isPubliclyReadable() throws IOException, InterruptedException {
+        final String key = "public/put-file.txt";
+        final byte[] payload = "public-content".getBytes(StandardCharsets.UTF_8);
+        this.client.put(key, "text/plain", payload, Map.of());
+
+        final HttpResponse<byte[]> response = sendUnsignedGet(key);
+        Assertions.assertEquals(200, response.statusCode());
+        Assertions.assertArrayEquals(payload, response.body());
+    }
+
     // --- Conditional response fields ---
 
     // --- Overwrite ---
@@ -183,6 +197,14 @@ class S3PutClientTest {
         Assertions.assertFalse(eTag.isBlank());
         final String stripped = stripQuotes(eTag);
         Assertions.assertFalse(stripped.isBlank(), "ETag after stripping quotes should not be blank: " + eTag);
+    }
+
+    private static HttpResponse<byte[]> sendUnsignedGet(final String key) throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest
+            .newBuilder(URI.create(S3_MOCK.getHttpEndpoint() + "/bucket/" + key))
+            .GET()
+            .build();
+        return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofByteArray());
     }
 
 }

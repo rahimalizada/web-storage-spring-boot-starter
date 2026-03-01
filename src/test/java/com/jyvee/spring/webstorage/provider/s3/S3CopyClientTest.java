@@ -28,6 +28,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -107,6 +110,20 @@ class S3CopyClientTest {
     }
 
     @Test
+    void copy_destinationFile_isPubliclyReadable() throws IOException, InterruptedException {
+        final String fromKey = "copy/public/source.txt";
+        final String toKey = "copy/public/destination.txt";
+        final byte[] payload = "public-copy-content".getBytes(StandardCharsets.UTF_8);
+        this.putClient.put(fromKey, "text/plain", payload, Map.of());
+
+        this.copyClient.copy(fromKey, toKey);
+
+        final HttpResponse<byte[]> response = sendUnsignedGet(toKey);
+        Assertions.assertEquals(200, response.statusCode());
+        Assertions.assertArrayEquals(payload, response.body());
+    }
+
+    @Test
     void copy_nonExistentBucket_throwsIOException() {
         final S3StorageConfigurationProperties props = new S3StorageConfigurationPropertiesImpl(URI.create(
             S3_MOCK.getHttpEndpoint()
@@ -121,6 +138,14 @@ class S3CopyClientTest {
             return eTag.substring(1, eTag.length() - 1);
         }
         return eTag;
+    }
+
+    private static HttpResponse<byte[]> sendUnsignedGet(final String key) throws IOException, InterruptedException {
+        final HttpRequest request = HttpRequest
+            .newBuilder(URI.create(S3_MOCK.getHttpEndpoint() + "/bucket/" + key))
+            .GET()
+            .build();
+        return HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofByteArray());
     }
 
 }
