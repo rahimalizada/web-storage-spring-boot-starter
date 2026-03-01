@@ -25,6 +25,7 @@ import com.jyvee.spring.webstorage.provider.s3.S3PutClient;
 import com.jyvee.spring.webstorage.provider.s3.S3PutResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -35,11 +36,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-// @Disabled("Manual real DigitalOcean Spaces integration test. Provide env vars and enable to run.")
+@Disabled("Manual real DigitalOcean Spaces integration test. Provide env vars and enable to run.")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class DigitalOceanSpacesStorageRepositoryIT {
+class DigitalOceanITTest {
 
-    private static final String DO_SPACES_URI_TEMPLATE =
+    private static final String DO_SPACES_URI =
         "https://fra1.digitaloceanspaces.com/?region=fra1&bucket=greencactus&key=${TRADING_GC_DEV_S3_KEY}&secret=$"
         + "{TRADING_GC_DEV_S3_SECRET}&endpoint=https://greencactus.fra1.digitaloceanspaces.com";
 
@@ -73,11 +74,9 @@ class DigitalOceanSpacesStorageRepositoryIT {
         this.deleteClient.delete(List.of(TEST_KEY));
 
         final S3PutResponse putResponse = this.putClient.put(TEST_KEY, "text/plain", PAYLOAD, METADATA);
-        System.err.println(putResponse);
         Assertions.assertFalse(stripQuotes(putResponse.eTag()).isBlank(), "PUT ETag should not be blank");
 
         final S3GetResponse getResponse = this.getClient.get(TEST_KEY);
-        System.err.println(getResponse);
         Assertions.assertEquals("text/plain", getResponse.contentType());
         Assertions.assertEquals(PAYLOAD.length, getResponse.contentLength());
         Assertions.assertEquals("it", getResponse.metadata().get("source"));
@@ -91,9 +90,7 @@ class DigitalOceanSpacesStorageRepositoryIT {
         final String key = requiredSecret("TRADING_GC_DEV_S3_KEY");
         final String secret = requiredSecret("TRADING_GC_DEV_S3_SECRET");
 
-        return DO_SPACES_URI_TEMPLATE
-            .replace("${TRADING_GC_DEV_S3_KEY}", key)
-            .replace("${TRADING_GC_DEV_S3_SECRET}", secret);
+        return DO_SPACES_URI.replace("${TRADING_GC_DEV_S3_KEY}", key).replace("${TRADING_GC_DEV_S3_SECRET}", secret);
     }
 
     private static String requiredSecret(final String name) {
